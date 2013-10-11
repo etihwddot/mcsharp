@@ -38,7 +38,9 @@ namespace MCSharp
 				case NbtKind.Double:
 					return null;
 				case NbtKind.ByteArray:
-					return null;
+					int byteCount = BinaryUtility.ConvertBigEndianToInt32(m_reader.ReadBytes(4), 0, 4);
+					byte[] bytes = m_reader.ReadBytes(byteCount);
+					return new NbtByteArray(name, bytes);
 				case NbtKind.String:
 					return null;
 				case NbtKind.List:
