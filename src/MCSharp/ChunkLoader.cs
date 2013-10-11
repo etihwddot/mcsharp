@@ -40,7 +40,10 @@ namespace MCSharp
 				{
 					// return empty chunks
 					if (!chunk.ChunkExists)
+					{
 						yield return ChunkData.Empty;
+						continue;
+					}
 
 					// seek to the start of the data for the chunk
 					stream.Seek(chunk.AbsoluteOffset, SeekOrigin.Begin);
