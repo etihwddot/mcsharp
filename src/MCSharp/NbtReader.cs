@@ -44,7 +44,12 @@ namespace MCSharp
 				case NbtKind.List:
 					return null;
 				case NbtKind.Compound:
-					return null;
+					List<Nbt> tags = new List<Nbt>();
+					Nbt currentTag;
+					while ((currentTag = ReadTag()).Kind != NbtKind.End)
+						tags.Add(currentTag);
+
+					return new NbtCompound(name, tags);
 				case NbtKind.IntArray:
 					return null;
 				default:

@@ -50,6 +50,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="NamedBinaryTag.cs" />
     <Compile Include="NamedBinaryTagKind.cs" />
+    <Compile Include="NbtCompound.cs" />
     <Compile Include="NbtEnd.cs" />
     <Compile Include="NbtReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
