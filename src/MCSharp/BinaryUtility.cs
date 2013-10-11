@@ -6,15 +6,22 @@ namespace MCSharp
 	{
 		public static int ConvertBigEndianToInt32(byte[] bytes, int start, int count)
 		{
-			if (count > 4)
-				throw new ArgumentOutOfRangeException("count", "Count must be less than 4 bytes.");
-			if (count <= 0)
-				throw new ArgumentOutOfRangeException("count", "Count must be greater than 0.");
+			if (start < 0 || start >= bytes.Length)
+				throw new ArgumentOutOfRangeException("start", "Start must be a valid array index");
+			if (count < 1 || count > 4)
+				throw new ArgumentOutOfRangeException("count", "Count must be between 1 and 4 bytes.");
+			if (start + count > bytes.Length)
+				throw new ArgumentOutOfRangeException("count", "Start + Count must be within the array's bounds.");
 
-			int value = 0;
-			for (int byteIndex = 0; byteIndex < count; byteIndex++)
-				value |= bytes[start + byteIndex] << (count - 1 - byteIndex) * 8;
-			return value;
+			switch (count)
+			{
+				case 1: return bytes[start];
+				case 2: return bytes[start] << 8 | bytes[start + 1];
+				case 3: return bytes[start] << 16 | bytes[start + 1] << 8 | bytes[start + 2];
+				case 4: return bytes[start] << 24 | bytes[start + 1] << 16 | bytes[start + 2] << 8 | bytes[start + 3];
+				default:
+					throw new InvalidOperationException();
+			}
 		}
 	}
 }
