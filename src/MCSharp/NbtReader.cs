@@ -42,7 +42,11 @@ namespace MCSharp
 				case NbtKind.String:
 					return null;
 				case NbtKind.List:
-					return null;
+					NbtKind itemKind = (NbtKind) m_reader.ReadByte();
+					int itemCount = BinaryUtility.ConvertBigEndianToInt32(m_reader.ReadBytes(4), 0, 4);
+					List<Nbt> items = new List<Nbt>();
+					// TODO: read payload data
+					return new NbtList(name, items);
 				case NbtKind.Compound:
 					List<Nbt> tags = new List<Nbt>();
 					Nbt currentTag;
