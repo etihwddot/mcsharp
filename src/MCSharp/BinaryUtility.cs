@@ -4,7 +4,7 @@ namespace MCSharp
 {
     public static class BinaryUtility
     {
-        public int ConvertBigEndianToInt32(byte[] bytes, int start, int count)
+        public static int ConvertBigEndianToInt32(byte[] bytes, int start, int count)
         {
 	        if (count > 4)
 		        throw new ArgumentOutOfRangeException("count", "Count must be less than 4 bytes.");
