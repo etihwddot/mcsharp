@@ -7,7 +7,7 @@ namespace MCSharp
 {
 	public sealed class ChunkData
 	{
-		public ChunkData(IEnumerable<NamedBinaryTag> tags)
+		public ChunkData(IEnumerable<Nbt> tags)
 		{
 			if (tags == null)
 				throw new ArgumentNullException("tags");
@@ -17,7 +17,7 @@ namespace MCSharp
 
 		public static readonly ChunkData Empty = new ChunkData();
 
-		public ReadOnlyCollection<NamedBinaryTag> Tags
+		public ReadOnlyCollection<Nbt> Tags
 		{
 			get { return m_tags; }
 		}
@@ -29,9 +29,9 @@ namespace MCSharp
 
 		private ChunkData()
 		{
-			m_tags = new List<NamedBinaryTag>().AsReadOnly();
+			m_tags = new List<Nbt>().AsReadOnly();
 		}
 
-		ReadOnlyCollection<NamedBinaryTag> m_tags;
+		ReadOnlyCollection<Nbt> m_tags;
 	}
 }

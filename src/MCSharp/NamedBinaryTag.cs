@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MCSharp
 {
-	public abstract class NamedBinaryTag
+	public abstract class Nbt
 	{
-		public NamedBinaryTagKind Kind
+		public NbtKind Kind
 		{
 			get { return m_kind; }
 		}
@@ -18,13 +18,13 @@ namespace MCSharp
 			get { return m_name; }
 		}
 
-		protected NamedBinaryTag(NamedBinaryTagKind kind, string name)
+		protected Nbt(NbtKind kind, string name)
 		{
 			m_kind = kind;
 			m_name = name;
 		}
 
-		NamedBinaryTagKind m_kind;
+		NbtKind m_kind;
 		string m_name;
 	}
 }

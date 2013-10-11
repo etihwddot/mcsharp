@@ -49,13 +49,18 @@ namespace MCSharp
 					int compressedSize = BinaryUtility.ConvertBigEndianToInt32(reader.ReadBytes(4), 0, 4);
 					ChunkCompressionType compressionType = (ChunkCompressionType)reader.ReadByte();
 
+					List<Nbt> tags = new List<Nbt>();
 					using (Stream chunkDataStream = GetDecompressionStream(compressionType, stream))
 					using (BinaryReader chunkDataReader = new BinaryReader(chunkDataStream))
 					{
-						NamedBinaryTagKind tag = (NamedBinaryTagKind)chunkDataReader.ReadByte();
-						int nameLength = BinaryUtility.ConvertBigEndianToInt32(chunkDataReader.ReadBytes(2), 0, 2);
-						string name = Encoding.UTF8.GetString(chunkDataReader.ReadBytes(nameLength));
+						NbtReader nbtReader = new NbtReader(chunkDataReader);
+
+						Nbt tag;
+						while ((tag = nbtReader.ReadTag()) != null)
+							tags.Add(tag);
 					}
+
+					yield return new ChunkData(tags);
 				}
 			}
 		}

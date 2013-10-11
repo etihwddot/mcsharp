@@ -13,7 +13,7 @@ namespace MCSharp.Console
 
 			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFilePath);
 			ChunkData chunk = regionChunks.First();
-			foreach (NamedBinaryTag tag in chunk.Tags)
+			foreach (Nbt tag in chunk.Tags)
 			{
 
 			}

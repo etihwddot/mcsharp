@@ -1,6 +1,6 @@
 ﻿namespace MCSharp
 {
-    public enum NamedBinaryTagKind : byte
+    public enum NbtKind : byte
     {
         End = 0,
         Byte = 1,
