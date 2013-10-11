@@ -49,6 +49,8 @@
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Nbt.cs" />
+    <Compile Include="NbtDouble.cs" />
+    <Compile Include="NbtFloat.cs" />
     <Compile Include="NbtKind.cs" />
     <Compile Include="NbtByte.cs" />
     <Compile Include="NbtByteArray.cs" />
@@ -59,6 +61,8 @@
     <Compile Include="NbtList.cs" />
     <Compile Include="NbtLong.cs" />
     <Compile Include="NbtReader.cs" />
+    <Compile Include="NbtShort.cs" />
+    <Compile Include="NbtString.cs" />
     <Compile Include="NbtValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

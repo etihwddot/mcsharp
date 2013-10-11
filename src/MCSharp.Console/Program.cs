@@ -12,10 +12,10 @@ namespace MCSharp.Console
 			string regionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region\r.0.0.mca");
 
 			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFilePath);
-			ChunkData chunk = regionChunks.First(x => !x.IsEmpty);
-			foreach (Nbt tag in chunk.Tags)
+			foreach (var chunk in regionChunks.Where(x => !x.IsEmpty).Take(10))
 			{
-				System.Console.WriteLine(tag);
+				foreach (Nbt tag in chunk.Tags)
+					System.Console.WriteLine(tag);
 			}
 		}
 	}

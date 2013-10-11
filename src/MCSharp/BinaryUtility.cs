@@ -29,9 +29,9 @@ namespace MCSharp
 		public static long ConvertBigEndianToInt64(byte[] bytes)
 		{
 			if (bytes.Length != 8)
-				throw new ArgumentException("bytes", "Array must be 8 bytes.");
+				throw new ArgumentException("Array must be 8 bytes.", "bytes");
 
-			return
+			return 0L |
 				(long) bytes[0] << 8 * 7 |
 				(long) bytes[1] << 8 * 6 |
 				(long) bytes[2] << 8 * 5 |
@@ -39,8 +39,19 @@ namespace MCSharp
 				(long) bytes[4] << 8 * 3 |
 				(long) bytes[5] << 8 * 2 |
 				(long) bytes[6] << 8 |
-				(long) bytes[7];
+				bytes[7];
 		}
 
+		public static float ConvertBigEndianToSingle(byte[] bytes)
+		{
+			Array.Reverse(bytes);
+			return BitConverter.ToSingle(bytes, 0);
+		}
+
+		public static double ConvertBigEndianToDouble(byte[] bytes)
+		{
+			Array.Reverse(bytes);
+			return BitConverter.ToDouble(bytes, 0);
+		}
 	}
 }
