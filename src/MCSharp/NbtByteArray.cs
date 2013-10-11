@@ -14,6 +14,7 @@ namespace MCSharp
 			m_bytes = bytes;
 		}
 
+		// TODO: should not expose an array directly in the API
 		public byte[] Bytes
 		{
 			get { return m_bytes; }

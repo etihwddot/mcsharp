@@ -50,11 +50,16 @@
     <Compile Include="Constants.cs" />
     <Compile Include="NamedBinaryTag.cs" />
     <Compile Include="NamedBinaryTagKind.cs" />
+    <Compile Include="NbtByte.cs" />
     <Compile Include="NbtByteArray.cs" />
     <Compile Include="NbtCompound.cs" />
     <Compile Include="NbtEnd.cs" />
+    <Compile Include="NbtInt.cs" />
+    <Compile Include="NbtIntArray.cs" />
     <Compile Include="NbtList.cs" />
+    <Compile Include="NbtLong.cs" />
     <Compile Include="NbtReader.cs" />
+    <Compile Include="NbtValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -59,8 +59,8 @@ namespace MCSharp
 						NbtReader nbtReader = new NbtReader(chunkDataReader);
 
 						Nbt tag;
-						while ((tag = nbtReader.ReadTag()) != null)
-							tags.Add(tag);
+						while (stream.Position < compressedSize)
+							tags.Add(nbtReader.ReadTag());
 					}
 
 					yield return new ChunkData(tags);

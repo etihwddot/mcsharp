@@ -20,32 +20,32 @@ namespace MCSharp
 			if (kind == NbtKind.End)
 				return new NbtEnd();
 
-			int nameLength = BinaryUtility.ConvertBigEndianToInt32(m_reader.ReadBytes(2), 0, 2);
+			int nameLength = BinaryUtility.ConvertBigEndianToInt32(m_reader.ReadBytes(2));
 			string name = Encoding.UTF8.GetString(m_reader.ReadBytes(nameLength));
 
 			switch (kind)
 			{
 				case NbtKind.Byte:
-					return null;
+					return ReadNbtByte(name);
 				case NbtKind.Short:
-					return null;
+					throw new NotImplementedException();
 				case NbtKind.Int:
-					return null;
+					return ReadNbtInt(name);
 				case NbtKind.Long:
-					return null;
+					return ReadNbtLong(name);
 				case NbtKind.Float:
-					return null;
+					throw new NotImplementedException();
 				case NbtKind.Double:
-					return null;
+					throw new NotImplementedException();
 				case NbtKind.ByteArray:
-					int byteCount = BinaryUtility.ConvertBigEndianToInt32(m_reader.ReadBytes(4), 0, 4);
+					int byteCount = ReadInt();
 					byte[] bytes = m_reader.ReadBytes(byteCount);
 					return new NbtByteArray(name, bytes);
 				case NbtKind.String:
 					return null;
 				case NbtKind.List:
 					NbtKind itemKind = (NbtKind) m_reader.ReadByte();
-					int itemCount = BinaryUtility.ConvertBigEndianToInt32(m_reader.ReadBytes(4), 0, 4);
+					int itemCount = ReadInt();
 					List<Nbt> items = new List<Nbt>();
 					// TODO: read payload data
 					return new NbtList(name, items);
@@ -57,10 +57,45 @@ namespace MCSharp
 
 					return new NbtCompound(name, tags);
 				case NbtKind.IntArray:
-					return null;
+					return ReadNbtIntArray(name);
 				default:
 					throw new InvalidOperationException();
 			}
+		}
+
+		private int ReadInt()
+		{
+			byte[] bytes = m_reader.ReadBytes(4);
+			return BinaryUtility.ConvertBigEndianToInt32(bytes);
+		}
+
+		private NbtByte ReadNbtByte(string name)
+		{
+			byte value = m_reader.ReadByte();
+			return new NbtByte(name, value);
+		}
+
+		private NbtInt ReadNbtInt(string name)
+		{
+			int value = ReadInt();
+			return new NbtInt(name, value);
+		}
+
+		private NbtLong ReadNbtLong(string name)
+		{
+			byte[] bytes = m_reader.ReadBytes(8);
+			long value = BinaryUtility.ConvertBigEndianToInt64(bytes);
+			return new NbtLong(name, value);
+		}
+
+		private NbtIntArray ReadNbtIntArray(string name)
+		{
+
+			int size = ReadInt();
+			int[] values = new int[size];
+			for (int index = 0; index < size; index++)
+				values[index] = ReadInt();
+			return new NbtIntArray(name, values);
 		}
 
 		BinaryReader m_reader;
