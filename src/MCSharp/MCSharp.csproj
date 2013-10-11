@@ -48,8 +48,8 @@
     <Compile Include="ChunkInfo.cs" />
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="NamedBinaryTag.cs" />
-    <Compile Include="NamedBinaryTagKind.cs" />
+    <Compile Include="Nbt.cs" />
+    <Compile Include="NbtKind.cs" />
     <Compile Include="NbtByte.cs" />
     <Compile Include="NbtByteArray.cs" />
     <Compile Include="NbtCompound.cs" />
