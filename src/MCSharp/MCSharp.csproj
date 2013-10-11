@@ -44,10 +44,12 @@
   <ItemGroup>
     <Compile Include="BinaryUtility.cs" />
     <Compile Include="ChunkCompressionType.cs" />
+    <Compile Include="ChunkData.cs" />
     <Compile Include="ChunkInfo.cs" />
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="NamedBinaryTag.cs" />
+    <Compile Include="NamedBinaryTagKind.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

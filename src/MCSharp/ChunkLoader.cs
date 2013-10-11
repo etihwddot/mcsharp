@@ -22,24 +22,25 @@ namespace MCSharp
 			m_regionsPath = regionsPath;
 		}
 
-		private List<ChunkInfo> ReadRegion(string path)
+		public static IEnumerable<ChunkData> LoadChunksInRegion(string regionFilePath)
 		{
-			List<ChunkInfo> chunks = new List<ChunkInfo>(Constants.ChunksPerRegion);
-
-			using (FileStream stream = File.OpenRead(path))
+			using (FileStream stream = File.OpenRead(regionFilePath))
 			using (BinaryReader reader = new BinaryReader(stream))
 			{
+				// read chunk information from region header
+				List<ChunkInfo> infos = new List<ChunkInfo>(Constants.ChunksPerRegion);
 				for (int chunkIndex = 0; chunkIndex < Constants.ChunksPerRegion; chunkIndex++)
 				{
 					byte[] chunkInfo = reader.ReadBytes(4);
-					chunks.Add(new ChunkInfo(chunkIndex, BinaryUtility.ConvertBigEndianToInt32(chunkInfo, 0, 3), chunkInfo[3]));
+					infos.Add(new ChunkInfo(chunkIndex, BinaryUtility.ConvertBigEndianToInt32(chunkInfo, 0, 3), chunkInfo[3]));
 				}
 
-				foreach (ChunkInfo chunk in chunks)
+				// read chunk data
+				foreach (ChunkInfo chunk in infos)
 				{
-					// skip chunks that do not exist
+					// return empty chunks
 					if (!chunk.ChunkExists)
-						continue;
+						yield return ChunkData.Empty;
 
 					// seek to the start of the data for the chunk
 					stream.Seek(chunk.AbsoluteOffset, SeekOrigin.Begin);
@@ -51,17 +52,15 @@ namespace MCSharp
 					using (Stream chunkDataStream = GetDecompressionStream(compressionType, stream))
 					using (BinaryReader chunkDataReader = new BinaryReader(chunkDataStream))
 					{
-						NamedBinaryTag tag = (NamedBinaryTag)chunkDataReader.ReadByte();
+						NamedBinaryTagKind tag = (NamedBinaryTagKind)chunkDataReader.ReadByte();
 						int nameLength = BinaryUtility.ConvertBigEndianToInt32(chunkDataReader.ReadBytes(2), 0, 2);
 						string name = Encoding.UTF8.GetString(chunkDataReader.ReadBytes(nameLength));
 					}
 				}
 			}
-
-			return chunks;
 		}
 
-		private Stream GetDecompressionStream(ChunkCompressionType type, Stream stream)
+		private static Stream GetDecompressionStream(ChunkCompressionType type, Stream stream)
 		{
 			if (type == ChunkCompressionType.GZip)
 				return new GZipStream(stream, CompressionMode.Decompress, true);
