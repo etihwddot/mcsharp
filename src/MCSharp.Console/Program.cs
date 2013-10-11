@@ -15,7 +15,7 @@ namespace MCSharp.Console
 			ChunkData chunk = regionChunks.First();
 			foreach (Nbt tag in chunk.Tags)
 			{
-
+				System.Console.WriteLine(tag);
 			}
 		}
 	}

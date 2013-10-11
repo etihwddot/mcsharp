@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Logos.Utility;
 
 namespace MCSharp
 {
@@ -22,6 +18,11 @@ namespace MCSharp
 		{
 			m_kind = kind;
 			m_name = name;
+		}
+
+		public override string ToString()
+		{
+			return "{0}({1})".FormatInvariant(Kind, Name);
 		}
 
 		NbtKind m_kind;

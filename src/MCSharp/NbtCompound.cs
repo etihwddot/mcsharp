@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Logos.Utility;
 
 namespace MCSharp
 {
@@ -18,6 +17,23 @@ namespace MCSharp
 		public ReadOnlyCollection<Nbt> Tags
 		{ 
 			get { return m_tags; }
+		}
+
+		public override string ToString()
+		{
+			return string.Join("\n", ToStrings());
+		}
+
+		private IEnumerable<string> ToStrings()
+		{
+			yield return base.ToString();
+
+			foreach (string str in Tags.SelectMany(x => x is NbtCompound ?
+				((NbtCompound)x).ToStrings() :
+				new[] { x.ToString() }))
+			{
+				yield return "  " + str;
+			}
 		}
 
 		ReadOnlyCollection<Nbt> m_tags;
