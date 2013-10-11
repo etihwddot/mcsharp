@@ -1,0 +1,15 @@
+# ignore output folders
+bin/
+build/
+obj/
+
+# ignore generated files
+*.nupkg
+
+# ignore user-specific options files
+*.suo
+*.csproj.user
+_ReSharper.*
+*.DotSettings.user
+*.resharper.user
+*.ReSharper.user
