@@ -47,18 +47,23 @@ namespace MCSharp
 					// get the size and type of the compressed chunk data
 					int compressedSize = reader.ReadBigEndianInt32();
 					ChunkCompressionType compressionType = (ChunkCompressionType) reader.ReadByte();
+					byte[] compressedData = reader.ReadBytes(compressedSize - 1);
 
-					List<Nbt> tags = new List<Nbt>();
-					using (Stream chunkDataStream = GetDecompressionStream(compressionType, stream))
+					NbtCompound root;
+					using (MemoryStream memoryStream = new MemoryStream(compressedData))
+					using (Stream chunkDataStream = GetDecompressionStream(compressionType, memoryStream))
 					using (BinaryReader chunkDataReader = new BinaryReader(chunkDataStream))
 					{
 						NbtReader nbtReader = new NbtReader(chunkDataReader);
 
-						while (stream.Position - chunk.AbsoluteOffset < compressedSize)
-							tags.Add(nbtReader.ReadTag());
+						root = (NbtCompound) nbtReader.ReadTag();
+
+						// verify we read all of the compressed data
+						if (memoryStream.Position != memoryStream.Length)
+							throw new InvalidOperationException();
 					}
 
-					yield return new ChunkData(tags);
+					yield return new ChunkData(root);
 				}
 			}
 		}

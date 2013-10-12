@@ -14,8 +14,7 @@ namespace MCSharp.Console
 			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFilePath);
 			foreach (var chunk in regionChunks.Where(x => !x.IsEmpty))
 			{
-				foreach (Nbt tag in chunk.Tags)
-					System.Console.WriteLine(tag);
+				System.Console.WriteLine(chunk.Root);
 			}
 		}
 	}

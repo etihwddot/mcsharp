@@ -7,31 +7,31 @@ namespace MCSharp
 {
 	public sealed class ChunkData
 	{
-		public ChunkData(IEnumerable<Nbt> tags)
+		public ChunkData(NbtCompound root)
 		{
-			if (tags == null)
-				throw new ArgumentNullException("tags");
+			if (root == null)
+				throw new ArgumentNullException("root");
 
-			m_tags = tags.ToList().AsReadOnly();
+			m_root = root;
 		}
 
 		public static readonly ChunkData Empty = new ChunkData();
 
-		public ReadOnlyCollection<Nbt> Tags
+		public NbtCompound Root
 		{
-			get { return m_tags; }
+			get { return m_root; }
 		}
 
 		public bool IsEmpty
 		{
-			get { return m_tags.Count == 0; }
+			get { return m_root == null; }
 		}
 
 		private ChunkData()
 		{
-			m_tags = new List<Nbt>().AsReadOnly();
+			m_root = null;
 		}
 
-		ReadOnlyCollection<Nbt> m_tags;
+		NbtCompound m_root;
 	}
 }
