@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCSharp", "src\MCSharp\MCSharp.csproj", "{89E21CCD-CA50-4F0D-9AAF-DC4E5EBE5C3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCSharp.Console", "src\MCSharp.Console\MCSharp.Console.csproj", "{D5F504D4-F5A0-4E0A-9F90-ECBD23C04655}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCSharp.ConsoleApp", "src\MCSharp.ConsoleApp\MCSharp.ConsoleApp.csproj", "{D5F504D4-F5A0-4E0A-9F90-ECBD23C04655}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
