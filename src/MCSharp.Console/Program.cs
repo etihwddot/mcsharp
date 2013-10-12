@@ -39,6 +39,8 @@ namespace MCSharp.Console
 
 						if (biome == BiomeKind.Uncalculated)
 							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Black);
+						else if (biome == BiomeKind.DeepOcean)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkBlue);
 						else if (biome == BiomeKind.Ocean)
 							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Blue);
 						else
