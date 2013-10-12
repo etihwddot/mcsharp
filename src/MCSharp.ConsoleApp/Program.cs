@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace MCSharp.ConsoleApp
 {
@@ -18,47 +19,50 @@ namespace MCSharp.ConsoleApp
 			const int chunksPerRegion = 32;
 			const int blocksPerChunk = 16;
 			int regionSize = pixelsPerBlock * chunksPerRegion * blocksPerChunk;
-			string[] regionFiles = Directory.GetFiles(regionDirectory, "*.mca");
-
-			int minX = int.MaxValue;
-			int maxX = int.MinValue;
-			int minZ = int.MaxValue;
-			int maxZ = int.MinValue;
-			foreach (string regionFile in regionFiles)
-			{
-				string regionFileName = Path.GetFileName(regionFile);
-				string[] regionFileNameParts = regionFileName.Split('.');
-				int x = int.Parse(regionFileNameParts[1]);
-				int z = int.Parse(regionFileNameParts[2]);
-
-				minX = Math.Min(minX, x);
-				maxX = Math.Max(maxX, x);
-				minZ = Math.Min(minZ, z);
-				maxZ = Math.Max(maxZ, z);
-			}
-
-			int xRegionCount = maxX - minX + 1;
-			int zRegionCount = maxZ - minZ + 1;
-			Bitmap bitmap = new Bitmap(regionSize * xRegionCount, regionSize * zRegionCount);
 			
-			foreach (string regionFile in regionFiles)
-			{
-				string regionFileName = Path.GetFileName(regionFile);
+			List<RegionFile> regions = Directory.GetFiles(regionDirectory, "*.mca")
+				.Select(x => new RegionFile(x))
+				.ToList();
 
-				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFile);
+			// sorry Todd; couldn't resist. :-)
+			var bounds = new { minX = int.MaxValue, maxX = int.MinValue, minZ = int.MaxValue, maxZ = int.MinValue };
+			bounds = regions.Aggregate(bounds,
+				(acc, r) => new { minX = Math.Min(acc.minX, r.RegionX), maxX = Math.Max(acc.maxX,
+					r.RegionX), minZ = Math.Min(acc.minZ, r.RegionZ), maxZ = Math.Max(acc.maxZ, r.RegionZ) });
+
+			int xRegionCount = bounds.maxX - bounds.minX + 1;
+			int zRegionCount = bounds.maxZ - bounds.minZ + 1;
+			Bitmap bitmap = new Bitmap(regionSize * xRegionCount, regionSize * zRegionCount);
+			Graphics g = Graphics.FromImage(bitmap);			
+
+			foreach (RegionFile region in regions)
+			{
+				string regionFileName = Path.GetFileName(region.FileName);
+
+				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region.FileName);
 				foreach (ChunkData chunk in regionChunks)
 				{
-					int xOffset = (chunk.XPosition * blocksPerChunk) - (minX * regionSize);
-					int zOffset = (chunk.ZPosition * blocksPerChunk) - (minZ * regionSize);
-					
+					int xOffset = (chunk.XPosition * blocksPerChunk) - (bounds.minX * regionSize);
+					int zOffset = (chunk.ZPosition * blocksPerChunk) - (bounds.minZ * regionSize);
+			
 					for (int x = 0; x < blocksPerChunk; x++)
 					{
 						for (int z = 0; z < blocksPerChunk; z++)
 						{
+							int imageX = x + xOffset;
+							int imageY = z + zOffset;
+
 							BiomeKind biome = chunk.GetBiome(x, z);
 							Color color = GetColorForBiomeKind(biome);
-							bitmap.SetPixel(x + xOffset, z + zOffset, color);
+							bitmap.SetPixel(imageX, imageY, color);
 						}
+					}
+
+					if (chunk.XPosition == 0 && chunk.ZPosition == 0)
+					{
+						const int markerSize = 6;
+						g.DrawLine(new Pen(Color.Yellow, 2.5f), xOffset - markerSize, zOffset - markerSize, xOffset + markerSize, zOffset + markerSize);
+						g.DrawLine(new Pen(Color.Yellow, 2.5f), xOffset + markerSize, zOffset - markerSize, xOffset - markerSize, zOffset + markerSize);
 					}
 				}
 			}
