@@ -43,6 +43,16 @@ namespace MCSharp.Console
 							bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkBlue);
 						else if (biome == BiomeKind.Ocean)
 							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Blue);
+						else if (biome == BiomeKind.River)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.LightBlue);
+						else if (biome == BiomeKind.Beach)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.LightYellow);
+						else if (biome == BiomeKind.SunflowerPlains)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Green);
+						else if (biome == BiomeKind.Plains)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Green);
+						else if (biome == BiomeKind.Forest)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkGreen);
 						else
 							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Red);
 					}
