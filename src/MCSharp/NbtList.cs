@@ -1,20 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Logos.Utility;
 
 namespace MCSharp
 {
 	public sealed class NbtList : Nbt
 	{
-		public NbtList(string name, IEnumerable<Nbt> items)
+		public NbtList(string name, NbtKind itemKind, IEnumerable<Nbt> items)
 			: base(NbtKind.List, name)
 		{
+			m_itemKind = itemKind;
 			m_items = items.ToList().AsReadOnly();
 		}
 
-		ReadOnlyCollection<Nbt> m_items;
+		public NbtKind ItemKind
+		{
+			get { return m_itemKind; }
+		}
+
+		public ReadOnlyCollection<Nbt> Items
+		{
+			get { return m_items; }
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + "[{0}] <{1}>".FormatInvariant(Items.Count, ItemKind);
+		}
+
+		readonly NbtKind m_itemKind;
+		readonly ReadOnlyCollection<Nbt> m_items;
 	}
 }

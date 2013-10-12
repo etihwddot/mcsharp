@@ -53,7 +53,7 @@ namespace MCSharp
 					for (int index = 0; index < itemCount; index++)
 						items.Add(ReadTagForKind(itemKind, ""));
 
-					return new NbtList(name, items);
+					return new NbtList(name, itemKind, items);
 				case NbtKind.Compound:
 					List<Nbt> tags = new List<Nbt>();
 					Nbt currentTag;
