@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinaryUtility.cs" />
+    <Compile Include="BinaryReaderUtility.cs" />
     <Compile Include="ChunkCompressionType.cs" />
     <Compile Include="ChunkData.cs" />
     <Compile Include="ChunkInfo.cs" />

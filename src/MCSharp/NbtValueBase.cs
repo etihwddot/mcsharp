@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MCSharp
+﻿namespace MCSharp
 {
 	public abstract class NbtValueBase<T> : Nbt
 	{
 		protected NbtValueBase(NbtKind kind, string name, T value)
 			: base(kind, name)
 		{
+			m_value = value;
 		}
 
 		public T Value
@@ -18,6 +13,6 @@ namespace MCSharp
 			get { return m_value; }
 		}
 
-		T m_value;
+		readonly T m_value;
 	}
 }

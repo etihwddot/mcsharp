@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 using Logos.Utility.IO;
 
 namespace MCSharp
@@ -30,10 +29,7 @@ namespace MCSharp
 				// read chunk information from region header
 				List<ChunkInfo> infos = new List<ChunkInfo>(Constants.ChunksPerRegion);
 				for (int chunkIndex = 0; chunkIndex < Constants.ChunksPerRegion; chunkIndex++)
-				{
-					byte[] chunkInfo = reader.ReadBytes(4);
-					infos.Add(new ChunkInfo(chunkIndex, BinaryUtility.ConvertBigEndianToInt32(chunkInfo, 0, 3), chunkInfo[3]));
-				}
+					infos.Add(new ChunkInfo(chunkIndex, reader.ReadBigEndianInt32(3), reader.ReadByte()));
 
 				// read chunk data
 				foreach (ChunkInfo chunk in infos)
@@ -49,8 +45,8 @@ namespace MCSharp
 					stream.Seek(chunk.AbsoluteOffset, SeekOrigin.Begin);
 
 					// get the size and type of the compressed chunk data
-					int compressedSize = BinaryUtility.ConvertBigEndianToInt32(reader.ReadBytes(4), 0, 4);
-					ChunkCompressionType compressionType = (ChunkCompressionType)reader.ReadByte();
+					int compressedSize = reader.ReadBigEndianInt32();
+					ChunkCompressionType compressionType = (ChunkCompressionType) reader.ReadByte();
 
 					List<Nbt> tags = new List<Nbt>();
 					using (Stream chunkDataStream = GetDecompressionStream(compressionType, stream))
@@ -58,7 +54,6 @@ namespace MCSharp
 					{
 						NbtReader nbtReader = new NbtReader(chunkDataReader);
 
-						Nbt tag;
 						while (stream.Position - chunk.AbsoluteOffset < compressedSize)
 							tags.Add(nbtReader.ReadTag());
 					}
