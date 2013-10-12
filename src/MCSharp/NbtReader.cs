@@ -40,7 +40,8 @@ namespace MCSharp
 					return ReadNbtDouble(name);
 				case NbtKind.ByteArray:
 					int byteCount = m_reader.ReadBigEndianInt32();
-					byte[] bytes = m_reader.ReadBytes(byteCount);
+					sbyte[] bytes = new sbyte[byteCount];
+					Buffer.BlockCopy(m_reader.ReadBytes(byteCount), 0, bytes, 0, byteCount);
 					return new NbtByteArray(name, bytes);
 				case NbtKind.String:
 					return ReadNbtString(name);
@@ -74,7 +75,7 @@ namespace MCSharp
 
 		private NbtByte ReadNbtByte(string name)
 		{
-			return new NbtByte(name, (sbyte) m_reader.ReadByte());
+			return new NbtByte(name, m_reader.ReadSByte());
 		}
 
 		private NbtShort ReadNbtShort(string name)

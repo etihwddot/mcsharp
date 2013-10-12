@@ -23,16 +23,28 @@ namespace MCSharp.Console
 			Bitmap bitmap = new Bitmap(size, size);
 
 			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFilePath);
-			foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
+			foreach (ChunkData chunk in regionChunks)
 			{
-				System.Console.WriteLine(chunk.Root);
+				if (!chunk.IsEmpty)
+					System.Console.WriteLine(chunk.Root);
 
 				int xOffset = chunk.Info.X;
 				int zOffset = chunk.Info.Z;
 
 				for (int x = 0; x < blocksPerChunk; x++)
+				{
 					for (int z = 0; z < blocksPerChunk; z++)
-						bitmap.SetPixel(x + xOffset, z + zOffset, Color.Red);
+					{
+						BiomeKind biome = chunk.GetBiome(x, z);
+
+						if (biome == BiomeKind.Uncalculated)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Black);
+						else if (biome == BiomeKind.Ocean)
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Blue);
+						else
+							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Red);
+					}
+				}
 			}
 
 			bitmap.Save(outputLocation, ImageFormat.Png);

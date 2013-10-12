@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 namespace MCSharp
 {
 	// Data at http://minecraft.gamepedia.com/Data_Values#Biome_IDs seems inaccurate
-	public enum BiomeKind : byte
+	public enum BiomeKind : sbyte
 	{
-		Ocean,
+		Uncalculated = -1,
+		Ocean = 0,
 		Plains,
 		Desert,
 		ExtremeHills,

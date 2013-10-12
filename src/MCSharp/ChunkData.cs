@@ -12,7 +12,11 @@ namespace MCSharp
 			m_info = info;
 			m_root = root;
 			if (m_root != null)
+			{
 				m_level = (NbtCompound) m_root.Tags.Single();
+				m_biomes = m_level.Tags.OfType<NbtByteArray>().FirstOrDefault(x => x.Name == "Biomes");
+
+			}
 		}
 
 		public NbtCompound Root
@@ -25,6 +29,15 @@ namespace MCSharp
 			get { return m_info; }
 		}
 
+		public BiomeKind GetBiome(int chunkX, int chunkZ)
+		{
+			int index = chunkZ * Constants.ChunkSize + chunkX;
+			if (m_biomes == null)
+				return BiomeKind.Uncalculated;
+
+			return (BiomeKind) m_biomes.Bytes[index];
+		}
+
 		public bool IsEmpty
 		{
 			get { return m_root == null; }
@@ -33,5 +46,6 @@ namespace MCSharp
 		NbtCompound m_root;
 		NbtCompound m_level;
 		ChunkInfo m_info;
+		NbtByteArray m_biomes;
 	}
 }
