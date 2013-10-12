@@ -85,6 +85,11 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.ForestHills: return Color.DarkGreen;
 				case BiomeKind.ExtremeHills: return Color.Brown;
 				case BiomeKind.ExtremeHillsEdge: return Color.SaddleBrown;
+
+				// ExtremeHills+ has trees; randomly add some green pixels
+				case BiomeKind.ExtremeHillsPlus:
+					return rng.Next(11) < 10 ? Color.Brown : Color.ForestGreen;
+
 				case BiomeKind.Swampland: return Color.DarkOliveGreen;
 				case BiomeKind.Jungle: return Color.GreenYellow;
 				case BiomeKind.JungleHills: return Color.GreenYellow;
@@ -99,5 +104,7 @@ namespace MCSharp.ConsoleApp
 				default: return Color.Red;
 			}
 		}
+
+		private static Random rng = new Random();
 	}
 }
