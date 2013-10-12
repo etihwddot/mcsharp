@@ -10,7 +10,7 @@ namespace MCSharp
 	public sealed class NbtIntArray : Nbt
 	{
 		public NbtIntArray(string name, int[] values)
-			: base(NbtKind.Int, name)
+			: base(NbtKind.IntArray, name)
 		{
 			m_values = values;
 		}
