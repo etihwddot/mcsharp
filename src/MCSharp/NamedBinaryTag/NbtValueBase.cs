@@ -1,4 +1,4 @@
-﻿namespace MCSharp
+﻿namespace MCSharp.NamedBinaryTag
 {
 	public abstract class NbtValueBase<T> : Nbt
 	{

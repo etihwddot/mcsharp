@@ -1,4 +1,4 @@
-﻿namespace MCSharp
+﻿namespace MCSharp.NamedBinaryTag
 {
     public enum NbtKind : byte
     {

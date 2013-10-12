@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Logos.Utility.IO;
+using MCSharp.NamedBinaryTag;
 
 namespace MCSharp
 {

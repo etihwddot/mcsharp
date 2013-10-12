@@ -1,6 +1,6 @@
 ﻿using Logos.Utility;
 
-namespace MCSharp
+namespace MCSharp.NamedBinaryTag
 {
 	public abstract class Nbt
 	{

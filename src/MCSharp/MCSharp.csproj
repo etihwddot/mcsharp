@@ -49,22 +49,22 @@
     <Compile Include="ChunkInfo.cs" />
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Nbt.cs" />
-    <Compile Include="NbtDouble.cs" />
-    <Compile Include="NbtFloat.cs" />
-    <Compile Include="NbtKind.cs" />
-    <Compile Include="NbtByte.cs" />
-    <Compile Include="NbtByteArray.cs" />
-    <Compile Include="NbtCompound.cs" />
-    <Compile Include="NbtEnd.cs" />
-    <Compile Include="NbtInt.cs" />
-    <Compile Include="NbtIntArray.cs" />
-    <Compile Include="NbtList.cs" />
-    <Compile Include="NbtLong.cs" />
+    <Compile Include="NamedBinaryTag\Nbt.cs" />
+    <Compile Include="NamedBinaryTag\NbtDouble.cs" />
+    <Compile Include="NamedBinaryTag\NbtFloat.cs" />
+    <Compile Include="NamedBinaryTag\NbtKind.cs" />
+    <Compile Include="NamedBinaryTag\NbtByte.cs" />
+    <Compile Include="NamedBinaryTag\NbtByteArray.cs" />
+    <Compile Include="NamedBinaryTag\NbtCompound.cs" />
+    <Compile Include="NamedBinaryTag\NbtEnd.cs" />
+    <Compile Include="NamedBinaryTag\NbtInt.cs" />
+    <Compile Include="NamedBinaryTag\NbtIntArray.cs" />
+    <Compile Include="NamedBinaryTag\NbtList.cs" />
+    <Compile Include="NamedBinaryTag\NbtLong.cs" />
     <Compile Include="NbtReader.cs" />
-    <Compile Include="NbtShort.cs" />
-    <Compile Include="NbtString.cs" />
-    <Compile Include="NbtValueBase.cs" />
+    <Compile Include="NamedBinaryTag\NbtShort.cs" />
+    <Compile Include="NamedBinaryTag\NbtString.cs" />
+    <Compile Include="NamedBinaryTag\NbtValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
