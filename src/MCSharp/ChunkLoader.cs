@@ -37,7 +37,7 @@ namespace MCSharp
 					// return empty chunks
 					if (!chunk.ChunkExists)
 					{
-						yield return ChunkData.Empty;
+						yield return new ChunkData(chunk, null);
 						continue;
 					}
 
@@ -63,7 +63,7 @@ namespace MCSharp
 							throw new InvalidOperationException();
 					}
 
-					yield return new ChunkData(root);
+					yield return new ChunkData(chunk, root);
 				}
 			}
 		}

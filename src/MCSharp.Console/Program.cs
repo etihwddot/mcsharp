@@ -26,8 +26,13 @@ namespace MCSharp.Console
 			foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 			{
 				System.Console.WriteLine(chunk.Root);
-				
 
+				int xOffset = chunk.Info.X;
+				int zOffset = chunk.Info.Z;
+
+				for (int x = 0; x < blocksPerChunk; x++)
+					for (int z = 0; z < blocksPerChunk; z++)
+						bitmap.SetPixel(x + xOffset, z + zOffset, Color.Red);
 			}
 
 			bitmap.Save(outputLocation, ImageFormat.Png);

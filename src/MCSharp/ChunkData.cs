@@ -7,19 +7,22 @@ namespace MCSharp
 {
 	public sealed class ChunkData
 	{
-		public ChunkData(NbtCompound root)
+		public ChunkData(ChunkInfo info, NbtCompound root)
 		{
-			if (root == null)
-				throw new ArgumentNullException("root");
-
+			m_info = info;
 			m_root = root;
+			if (m_root != null)
+				m_level = (NbtCompound) m_root.Tags.Single();
 		}
-
-		public static readonly ChunkData Empty = new ChunkData();
 
 		public NbtCompound Root
 		{
 			get { return m_root; }
+		}
+
+		public ChunkInfo Info
+		{
+			get { return m_info; }
 		}
 
 		public bool IsEmpty
@@ -27,11 +30,8 @@ namespace MCSharp
 			get { return m_root == null; }
 		}
 
-		private ChunkData()
-		{
-			m_root = null;
-		}
-
 		NbtCompound m_root;
+		NbtCompound m_level;
+		ChunkInfo m_info;
 	}
 }
