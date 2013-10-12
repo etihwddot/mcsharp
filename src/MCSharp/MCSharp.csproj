@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryReaderUtility.cs" />
+    <Compile Include="BiomeKind.cs" />
     <Compile Include="ChunkCompressionType.cs" />
     <Compile Include="ChunkData.cs" />
     <Compile Include="ChunkInfo.cs" />
