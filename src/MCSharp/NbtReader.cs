@@ -58,7 +58,7 @@ namespace MCSharp
 					while ((currentTag = ReadTag()).Kind != NbtKind.End)
 						tags.Add(currentTag);
 
-						return new NbtCompound(name, tags);
+					return new NbtCompound(name, tags);
 				case NbtKind.IntArray:
 					return ReadNbtIntArray(name);
 				default:
