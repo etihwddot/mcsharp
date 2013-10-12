@@ -79,7 +79,10 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.Ocean: return Color.Blue;
 				case BiomeKind.River: return Color.LightBlue;
 				case BiomeKind.Beach: return Color.LightYellow;
-				case BiomeKind.SunflowerPlains: return Color.Green;
+				
+				case BiomeKind.SunflowerPlains:
+					return rng.Next(31) < 30 ? Color.Green : Color.Yellow;
+				
 				case BiomeKind.Plains: return Color.Green;
 				case BiomeKind.Forest: return Color.DarkGreen;
 				case BiomeKind.ForestHills: return Color.DarkGreen;
@@ -95,12 +98,16 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.JungleHills: return Color.GreenYellow;
 				case BiomeKind.Desert: return Color.Yellow;
 				case BiomeKind.DesertHills: return Color.Yellow;
-				case BiomeKind.Taiga: return Color.White;
-				case BiomeKind.TaigaHills: return Color.WhiteSmoke;
+				case BiomeKind.ColdTaiga: return Color.White;
+				case BiomeKind.ColdTaigaHills: return Color.WhiteSmoke;
+				case BiomeKind.Taiga: return Color.ForestGreen;
+				case BiomeKind.TaigaHills: return Color.ForestGreen;
 				case BiomeKind.IcePlains: return Color.White;
 				case BiomeKind.IceMountains: return Color.White;
 				case BiomeKind.FrozenRiver: return Color.AntiqueWhite;
 				case BiomeKind.FrozenOcean: return Color.CornflowerBlue;
+				case BiomeKind.ColdBeach: return Color.Beige;
+				case BiomeKind.StoneBeach: return Color.DarkGray;
 				default: return Color.Red;
 			}
 		}
