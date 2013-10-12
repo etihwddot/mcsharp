@@ -15,7 +15,8 @@ namespace MCSharp
 			{
 				m_level = (NbtCompound) m_root.Tags.Single();
 				m_biomes = m_level.Tags.OfType<NbtByteArray>().FirstOrDefault(x => x.Name == "Biomes");
-
+				m_xPosition = m_level.Tags.OfType<NbtInt>().First(x => x.Name == "xPos").Value;
+				m_zPosition = m_level.Tags.OfType<NbtInt>().First(x => x.Name == "zPos").Value;
 			}
 		}
 
@@ -27,6 +28,16 @@ namespace MCSharp
 		public ChunkInfo Info
 		{
 			get { return m_info; }
+		}
+
+		public int XPosition
+		{
+			get { return m_xPosition; }
+		}
+
+		public int ZPosition
+		{
+			get { return m_zPosition; }
 		}
 
 		public BiomeKind GetBiome(int chunkX, int chunkZ)
@@ -47,5 +58,7 @@ namespace MCSharp
 		NbtCompound m_level;
 		ChunkInfo m_info;
 		NbtByteArray m_biomes;
+		int m_xPosition;
+		int m_zPosition;
 	}
 }

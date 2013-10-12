@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Logos.Utility;
+using System.Text.RegularExpressions;
 
 namespace MCSharp.Console
 {
@@ -11,50 +13,74 @@ namespace MCSharp.Console
 	{
 		static void Main(string[] args)
 		{
-			string regionFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region\r.0.0.mca");
+			string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
-
-
+			
 			const int pixelsPerBlock = 1;
 			const int chunksPerRegion = 32;
 			const int blocksPerChunk = 16;
-			int size = pixelsPerBlock * chunksPerRegion * blocksPerChunk;
+			int regionSize = pixelsPerBlock * chunksPerRegion * blocksPerChunk;
+			string[] regionFiles = Directory.GetFiles(regionDirectory, "*.mca");
 
-			Bitmap bitmap = new Bitmap(size, size);
-
-			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFilePath);
-			foreach (ChunkData chunk in regionChunks)
+			int minX = int.MaxValue;
+			int maxX = int.MinValue;
+			int minZ = int.MaxValue;
+			int maxZ = int.MinValue;
+			foreach (string regionFile in regionFiles)
 			{
-				if (!chunk.IsEmpty)
-					System.Console.WriteLine(chunk.Root);
+				string regionFileName = Path.GetFileName(regionFile);
+				string[] regionFileNameParts = regionFileName.Split('.');
+				int x = int.Parse(regionFileNameParts[1]);
+				int z = int.Parse(regionFileNameParts[2]);
 
-				int xOffset = chunk.Info.X;
-				int zOffset = chunk.Info.Z;
+				minX = Math.Min(minX, x);
+				maxX = Math.Max(maxX, x);
+				minZ = Math.Min(minZ, z);
+				maxZ = Math.Max(maxZ, z);
+			}
 
-				for (int x = 0; x < blocksPerChunk; x++)
+			int xRegionCount = maxX - minX + 1;
+			int zRegionCount = maxZ - minZ + 1;
+			Bitmap bitmap = new Bitmap(regionSize * xRegionCount, regionSize * zRegionCount);
+			
+			foreach (string regionFile in regionFiles)
+			{
+				string regionFileName = Path.GetFileName(regionFile);
+
+				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(regionFile);
+				foreach (ChunkData chunk in regionChunks)
 				{
-					for (int z = 0; z < blocksPerChunk; z++)
-					{
-						BiomeKind biome = chunk.GetBiome(x, z);
+					if (!chunk.IsEmpty)
+						System.Console.WriteLine(chunk.Root);
 
-						if (biome == BiomeKind.Uncalculated)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Black);
-						else if (biome == BiomeKind.DeepOcean)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkBlue);
-						else if (biome == BiomeKind.Ocean)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Blue);
-						else if (biome == BiomeKind.River)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.LightBlue);
-						else if (biome == BiomeKind.Beach)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.LightYellow);
-						else if (biome == BiomeKind.SunflowerPlains)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Green);
-						else if (biome == BiomeKind.Plains)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Green);
-						else if (biome == BiomeKind.Forest)
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkGreen);
-						else
-							bitmap.SetPixel(x + xOffset, z + zOffset, Color.Red);
+					int xOffset = (chunk.XPosition * blocksPerChunk) - (minX * regionSize);
+					int zOffset = (chunk.ZPosition * blocksPerChunk) - (minZ * regionSize);
+					
+					for (int x = 0; x < blocksPerChunk; x++)
+					{
+						for (int z = 0; z < blocksPerChunk; z++)
+						{
+							BiomeKind biome = chunk.GetBiome(x, z);
+
+							if (biome == BiomeKind.Uncalculated)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.Black);
+							else if (biome == BiomeKind.DeepOcean)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkBlue);
+							else if (biome == BiomeKind.Ocean)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.Blue);
+							else if (biome == BiomeKind.River)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.LightBlue);
+							else if (biome == BiomeKind.Beach)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.LightYellow);
+							else if (biome == BiomeKind.SunflowerPlains)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.Green);
+							else if (biome == BiomeKind.Plains)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.Green);
+							else if (biome == BiomeKind.Forest)
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.DarkGreen);
+							else
+								bitmap.SetPixel(x + xOffset, z + zOffset, Color.Red);
+						}
 					}
 				}
 			}
