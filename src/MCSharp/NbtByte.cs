@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace MCSharp
 {
-	public sealed class NbtByte : NbtValueBase<byte>
+	public sealed class NbtByte : NbtValueBase<sbyte>
 	{
-		public NbtByte(string name, byte value)
+		public NbtByte(string name, sbyte value)
 			: base(NbtKind.Byte, name, value)
 		{
 		}

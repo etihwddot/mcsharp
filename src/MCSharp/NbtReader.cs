@@ -74,7 +74,7 @@ namespace MCSharp
 
 		private NbtByte ReadNbtByte(string name)
 		{
-			return new NbtByte(name, m_reader.ReadByte());
+			return new NbtByte(name, (sbyte) m_reader.ReadByte());
 		}
 
 		private NbtShort ReadNbtShort(string name)
