@@ -24,7 +24,7 @@ namespace MCSharp
 
 		public static IEnumerable<ChunkData> LoadChunksInRegion(RegionFile regionFile)
 		{
-			using (FileStream stream = File.OpenRead(regionFile.FileName))
+			using (Stream stream = File.OpenRead(regionFile.FileName))
 			using (BinaryReader reader = new BinaryReader(stream))
 			{
 				// read chunk information from region header

@@ -53,7 +53,7 @@ namespace MCSharp.ConsoleApp
 			Bitmap bitmap = new Bitmap(regionSize * xRegionCount, regionSize * zRegionCount);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
-				foreach (RegionFile region in regions)
+				regions.AsParallel().ForAll(region =>
 				{
 					string regionFileName = Path.GetFileName(region.FileName);
 
@@ -83,7 +83,7 @@ namespace MCSharp.ConsoleApp
 							originZOffset = zOffset;
 						}
 					}
-				}
+				});
 			}
 
 			// draw marker at 0, 0

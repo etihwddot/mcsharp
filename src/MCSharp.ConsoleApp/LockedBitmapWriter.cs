@@ -13,6 +13,7 @@ namespace MCSharp.ConsoleApp
 
 			//Lock Image
 			m_lockedBitmap = m_bitmap.LockBits(new Rectangle(new Point(), m_bitmap.Size), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+			m_width = m_bitmap.Width;
 			m_data = m_lockedBitmap.Scan0;
 		}
 
@@ -28,7 +29,7 @@ namespace MCSharp.ConsoleApp
 
 		public void SetPixel(int x, int y, Color color)
 		{
-			IntPtr currentPixel = new IntPtr(m_data.ToInt64() + y * (m_bitmap.Width * c_bytesPerPixel) + (x * c_bytesPerPixel));
+			IntPtr currentPixel = new IntPtr(m_data.ToInt64() + y * (m_width * c_bytesPerPixel) + (x * c_bytesPerPixel));
 			Marshal.Copy(new byte[] { color.B, color.G, color.R, color.A }, 0, currentPixel, c_bytesPerPixel);
 		}
 
@@ -37,5 +38,6 @@ namespace MCSharp.ConsoleApp
 		Bitmap m_bitmap;
 		BitmapData m_lockedBitmap;
 		IntPtr m_data;
+		int m_width;
 	}
 }
