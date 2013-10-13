@@ -12,8 +12,8 @@ namespace MCSharp.ConsoleApp
 	{
 		static void Main(string[] args)
 		{
-			// string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
-			string regionDirectory = @"C:\Users\todd\Desktop\region";
+			string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
+			// string regionDirectory = @"C:\Users\todd\Desktop\region";
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
