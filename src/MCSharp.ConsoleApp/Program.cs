@@ -19,11 +19,6 @@ namespace MCSharp.ConsoleApp
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 			
-			const int pixelsPerBlock = 1;
-			const int chunksPerRegion = 32;
-			const int blocksPerChunk = 16;
-			int regionSize = pixelsPerBlock * chunksPerRegion * blocksPerChunk;
-			
 			List<RegionFile> regions = Directory.GetFiles(regionDirectory, "*.mca")
 				.Select(x => new RegionFile(x))
 				.ToList();
@@ -51,7 +46,7 @@ namespace MCSharp.ConsoleApp
 			int? originXOffset = null;
 			int? originZOffset = null;
 
-			Bitmap bitmap = new Bitmap(regionSize * xRegionCount, regionSize * zRegionCount);
+			Bitmap bitmap = new Bitmap(Constants.RegionBlockWidth * xRegionCount, Constants.RegionBlockWidth * zRegionCount);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
 				regions.AsParallel().ForAll(region =>
@@ -62,14 +57,14 @@ namespace MCSharp.ConsoleApp
 
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition.Value * blocksPerChunk) - (bounds.minX * regionSize);
-						int zOffset = (chunk.ZPosition.Value * blocksPerChunk) - (bounds.minZ * regionSize);
+						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - (bounds.minX * Constants.RegionBlockWidth);
+						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - (bounds.minZ * Constants.RegionBlockWidth);
 
 
-						for (int x = 0; x < blocksPerChunk; x++)
+						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 						{
 							int? lastHeight = null;
-							for (int z = 0; z < blocksPerChunk; z++)
+							for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 							{
 								int imageX = x + xOffset;
 								int imageY = z + zOffset;
