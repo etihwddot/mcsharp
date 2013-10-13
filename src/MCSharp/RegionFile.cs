@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MCSharp.ConsoleApp
+namespace MCSharp
 {
 	public sealed class RegionFile
 	{

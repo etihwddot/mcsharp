@@ -66,6 +66,7 @@
     <Compile Include="NamedBinaryTag\NbtString.cs" />
     <Compile Include="NamedBinaryTag\NbtValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegionFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
