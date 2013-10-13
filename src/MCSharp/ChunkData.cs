@@ -51,7 +51,7 @@ namespace MCSharp
 
 		private static int LocationToIndex(int chunkX, int chunkZ)
 		{
-			return chunkZ * Constants.ChunkSize + chunkX;
+			return chunkZ * Constants.ChunkBlockWidth + chunkX;
 		}
 
 		public int GetHeight(int chunkX, int chunkZ)
