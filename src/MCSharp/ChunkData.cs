@@ -8,17 +8,17 @@ namespace MCSharp
 {
 	public sealed class ChunkData
 	{
-		public ChunkData(ChunkInfo info, NbtCompound root)
+		public static ChunkData Create(ChunkInfo info, NbtCompound root)
+		{
+			var chunk = new ChunkData(info, root);
+			chunk.Initialize();
+			return chunk;
+		}
+
+		private ChunkData(ChunkInfo info, NbtCompound root)
 		{
 			m_info = info;
 			m_root = root;
-			if (m_root != null)
-			{
-				m_level = (NbtCompound) m_root.Tags.Single();
-				m_biomes = m_level.Tags.OfType<NbtByteArray>().FirstOrDefault(x => x.Name == "Biomes");
-				m_xPosition = m_level.Tags.OfType<NbtInt>().First(x => x.Name == "xPos").Value;
-				m_zPosition = m_level.Tags.OfType<NbtInt>().First(x => x.Name == "zPos").Value;
-			}
 		}
 
 		public NbtCompound Root
@@ -48,6 +48,30 @@ namespace MCSharp
 				return BiomeKind.Uncalculated;
 
 			return (BiomeKind) m_biomes.Bytes[index];
+		}
+
+		private void Initialize()
+		{
+			if (m_root == null)
+				return;
+
+			m_level = (NbtCompound) m_root.Tags.Single();
+
+			foreach (Nbt tag in m_level.Tags)
+			{
+				switch (tag.Name)
+				{
+				case "Biomes":
+					m_biomes = (NbtByteArray) tag;
+					break;
+				case "xPos":
+					m_xPosition = ((NbtInt) tag).Value;
+					break;
+				case "zPos":
+					m_zPosition = ((NbtInt) tag).Value;
+					break;
+				}
+			}
 		}
 
 		public bool IsEmpty
