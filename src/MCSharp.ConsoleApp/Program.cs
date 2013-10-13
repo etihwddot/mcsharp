@@ -12,7 +12,7 @@ namespace MCSharp.ConsoleApp
 		static void Main(string[] args)
 		{
 			string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
-			//string regionDirectory = @"C:\Users\todd\Desktop\region";
+			// string regionDirectory = @"C:\Users\todd\Desktop\region";
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 			
 			const int pixelsPerBlock = 1;
@@ -86,12 +86,12 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.Plains: return Color.Green;
 				case BiomeKind.Forest: return Color.DarkGreen;
 				case BiomeKind.ForestHills: return Color.DarkGreen;
-				case BiomeKind.ExtremeHills: return Color.Brown;
-				case BiomeKind.ExtremeHillsEdge: return Color.SaddleBrown;
+				case BiomeKind.ExtremeHills: return Color.DarkGray;
+				case BiomeKind.ExtremeHillsEdge: return Color.LightGray;
 
 				// ExtremeHills+ has trees; randomly add some green pixels
 				case BiomeKind.ExtremeHillsPlus:
-					return rng.Next(11) < 10 ? Color.Brown : Color.ForestGreen;
+					return rng.Next(11) < 10 ? Color.DarkGray : Color.ForestGreen;
 
 				case BiomeKind.Swampland: return Color.DarkOliveGreen;
 				case BiomeKind.Jungle: return Color.GreenYellow;
@@ -108,6 +108,11 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.FrozenOcean: return Color.CornflowerBlue;
 				case BiomeKind.ColdBeach: return Color.Beige;
 				case BiomeKind.StoneBeach: return Color.DarkGray;
+				
+				// RoofedForest has mushrooms; randomly add some red and tan pixels
+				case BiomeKind.RoofedForest:
+					int value = rng.Next(100);
+					return value < 98 ? Color.ForestGreen : value < 99 ? Color.Tan : Color.Red;
 				default: return Color.Red;
 			}
 		}
