@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -14,6 +15,8 @@ namespace MCSharp.ConsoleApp
 			string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
 			// string regionDirectory = @"C:\Users\todd\Desktop\region";
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
+
+			Stopwatch stopwatch = Stopwatch.StartNew();
 			
 			const int pixelsPerBlock = 1;
 			const int chunksPerRegion = 32;
@@ -68,6 +71,8 @@ namespace MCSharp.ConsoleApp
 			}
 
 			bitmap.Save(outputLocation, ImageFormat.Png);
+
+			Console.WriteLine("Total time: {0}", stopwatch.ElapsedMilliseconds);
 		}
 
 		private static Color GetColorForBiomeKind(BiomeKind biome)
