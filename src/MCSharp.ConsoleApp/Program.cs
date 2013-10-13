@@ -13,8 +13,8 @@ namespace MCSharp.ConsoleApp
 	{
 		static void Main(string[] args)
 		{
-			string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
-			// string regionDirectory = @"C:\Users\todd\Desktop\region";
+			// string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
+			string regionDirectory = @"C:\Users\todd\Desktop\region";
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
@@ -78,7 +78,7 @@ namespace MCSharp.ConsoleApp
 								if (lastHeight.HasValue && height > lastHeight)
 									color = ControlPaint.Light(color);
 								if (lastHeight.HasValue && height < lastHeight)
-									color = ControlPaint.Dark(color);
+									color = ControlPaint.Dark(color, 0.1f);
 
 								bitmapWriter.SetPixel(imageX, imageY, color);
 								lastHeight = height;
@@ -135,10 +135,10 @@ namespace MCSharp.ConsoleApp
 					return rng.Next(11) < 10 ? Color.DarkGray : Color.ForestGreen;
 
 				case BiomeKind.Swampland: return Color.DarkOliveGreen;
-				case BiomeKind.Jungle: return Color.GreenYellow;
-				case BiomeKind.JungleHills: return Color.GreenYellow;
-				case BiomeKind.Desert: return Color.Yellow;
-				case BiomeKind.DesertHills: return Color.Yellow;
+				case BiomeKind.Jungle: return Color.FromArgb(0x0D, 0x35, 0x01);
+				case BiomeKind.JungleHills: return Color.FromArgb(0x0D, 0x35, 0x01);
+				case BiomeKind.Desert: return Color.FromArgb(0xDB, 0xD3, 0xA0);
+				case BiomeKind.DesertHills: return Color.FromArgb(0xDB, 0xD3, 0xA0);
 				case BiomeKind.ColdTaiga: return Color.White;
 				case BiomeKind.ColdTaigaHills: return Color.WhiteSmoke;
 				case BiomeKind.Taiga: return Color.ForestGreen;
