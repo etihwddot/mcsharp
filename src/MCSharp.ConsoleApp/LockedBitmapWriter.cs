@@ -31,7 +31,7 @@ namespace MCSharp.ConsoleApp
 			IntPtr currentPixel = new IntPtr(m_data.ToInt64() + y * (m_bitmap.Width * c_bytesPerPixel) + (x * c_bytesPerPixel));
 			Marshal.Copy(new byte[] { color.B, color.G, color.R, color.A }, 0, currentPixel, c_bytesPerPixel);
 		}
-		
+
 		const int c_bytesPerPixel = 4;
 
 		Bitmap m_bitmap;

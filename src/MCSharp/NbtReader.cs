@@ -67,7 +67,7 @@ namespace MCSharp
 
 		private NbtShort ReadNbtShort(string name)
 		{
-			return new NbtShort(name, (short) m_reader.ReadBigEndianInt32(2));
+			return new NbtShort(name, (short)m_reader.ReadBigEndianInt32(2));
 		}
 
 		private NbtInt ReadNbtInt(string name)
@@ -93,7 +93,7 @@ namespace MCSharp
 		private NbtByteArray ReadNbtByteArray(string name)
 		{
 			int byteCount = m_reader.ReadBigEndianInt32();
-			
+
 			// copy the bytes from the stream to a signed byte array
 			sbyte[] bytes = new sbyte[byteCount];
 			Buffer.BlockCopy(m_reader.ReadBytes(byteCount), 0, bytes, 0, byteCount);
@@ -108,9 +108,9 @@ namespace MCSharp
 
 		private NbtList ReadNbtList(string name)
 		{
-			NbtKind itemKind = (NbtKind) m_reader.ReadByte();
+			NbtKind itemKind = (NbtKind)m_reader.ReadByte();
 			int itemCount = m_reader.ReadBigEndianInt32();
-			
+
 			List<Nbt> items = new List<Nbt>(itemCount);
 			for (int index = 0; index < itemCount; index++)
 				items.Add(ReadTagForKind(itemKind, ""));
