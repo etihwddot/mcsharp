@@ -57,7 +57,7 @@ namespace MCSharp.ConsoleApp
 				{
 					string regionFileName = Path.GetFileName(region.FileName);
 
-					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region.FileName);
+					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
