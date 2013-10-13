@@ -59,10 +59,10 @@ namespace MCSharp.ConsoleApp
 
 					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region.FileName);
 
-					foreach (ChunkData chunk in regionChunks)
+					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition * blocksPerChunk) - (bounds.minX * regionSize);
-						int zOffset = (chunk.ZPosition * blocksPerChunk) - (bounds.minZ * regionSize);
+						int xOffset = (chunk.XPosition.Value * blocksPerChunk) - (bounds.minX * regionSize);
+						int zOffset = (chunk.ZPosition.Value * blocksPerChunk) - (bounds.minZ * regionSize);
 
 						for (int x = 0; x < blocksPerChunk; x++)
 						{

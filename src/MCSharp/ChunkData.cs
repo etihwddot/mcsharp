@@ -31,12 +31,12 @@ namespace MCSharp
 			get { return m_info; }
 		}
 
-		public int XPosition
+		public int? XPosition
 		{
 			get { return m_xPosition; }
 		}
 
-		public int ZPosition
+		public int? ZPosition
 		{
 			get { return m_zPosition; }
 		}
@@ -59,7 +59,7 @@ namespace MCSharp
 		NbtCompound m_level;
 		ChunkInfo m_info;
 		NbtByteArray m_biomes;
-		int m_xPosition;
-		int m_zPosition;
+		int? m_xPosition;
+		int? m_zPosition;
 	}
 }
