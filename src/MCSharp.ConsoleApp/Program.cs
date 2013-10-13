@@ -16,7 +16,7 @@ namespace MCSharp.ConsoleApp
 			// string regionDirectory = @"C:\Users\todd\Desktop\region";
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
-			Stopwatch stopwatch = Stopwatch.StartNew();
+			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 			
 			const int pixelsPerBlock = 1;
 			const int chunksPerRegion = 32;
@@ -46,44 +46,58 @@ namespace MCSharp.ConsoleApp
 
 			int xRegionCount = bounds.maxX - bounds.minX + 1;
 			int zRegionCount = bounds.maxZ - bounds.minZ + 1;
+
+			int? originXOffset = null;
+			int? originZOffset = null;
+
 			Bitmap bitmap = new Bitmap(regionSize * xRegionCount, regionSize * zRegionCount);
-			Graphics g = Graphics.FromImage(bitmap);			
-
-			foreach (RegionFile region in regions)
+			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
-				string regionFileName = Path.GetFileName(region.FileName);
-
-				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region.FileName);
-				foreach (ChunkData chunk in regionChunks)
+				foreach (RegionFile region in regions)
 				{
-					int xOffset = (chunk.XPosition * blocksPerChunk) - (bounds.minX * regionSize);
-					int zOffset = (chunk.ZPosition * blocksPerChunk) - (bounds.minZ * regionSize);
-			
-					for (int x = 0; x < blocksPerChunk; x++)
+					string regionFileName = Path.GetFileName(region.FileName);
+
+					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region.FileName);
+
+					foreach (ChunkData chunk in regionChunks)
 					{
-						for (int z = 0; z < blocksPerChunk; z++)
+						int xOffset = (chunk.XPosition * blocksPerChunk) - (bounds.minX * regionSize);
+						int zOffset = (chunk.ZPosition * blocksPerChunk) - (bounds.minZ * regionSize);
+
+						for (int x = 0; x < blocksPerChunk; x++)
 						{
-							int imageX = x + xOffset;
-							int imageY = z + zOffset;
+							for (int z = 0; z < blocksPerChunk; z++)
+							{
+								int imageX = x + xOffset;
+								int imageY = z + zOffset;
 
-							BiomeKind biome = chunk.GetBiome(x, z);
-							Color color = GetColorForBiomeKind(biome);
-							bitmap.SetPixel(imageX, imageY, color);
+								BiomeKind biome = chunk.GetBiome(x, z);
+								Color color = GetColorForBiomeKind(biome);
+								bitmapWriter.SetPixel(imageX, imageY, color);
+							}
 						}
-					}
 
-					if (chunk.XPosition == 0 && chunk.ZPosition == 0)
-					{
-						const int markerSize = 6;
-						g.DrawLine(new Pen(Color.Yellow, 2.5f), xOffset - markerSize, zOffset - markerSize, xOffset + markerSize, zOffset + markerSize);
-						g.DrawLine(new Pen(Color.Yellow, 2.5f), xOffset + markerSize, zOffset - markerSize, xOffset - markerSize, zOffset + markerSize);
+						if (chunk.XPosition == 0 && chunk.ZPosition == 0)
+						{
+							originXOffset = xOffset;
+							originZOffset = zOffset;
+						}
 					}
 				}
 			}
 
+			// draw marker at 0, 0
+			if (originXOffset.HasValue && originZOffset.HasValue)
+			{
+				Graphics g = Graphics.FromImage(bitmap);
+				const int markerSize = 6;
+				g.DrawLine(new Pen(Color.Yellow, 2.5f), originXOffset.Value - markerSize, originZOffset.Value - markerSize, originXOffset.Value + markerSize, originZOffset.Value + markerSize);
+				g.DrawLine(new Pen(Color.Yellow, 2.5f), originXOffset.Value + markerSize, originZOffset.Value - markerSize, originXOffset.Value - markerSize, originZOffset.Value + markerSize);
+			}
+			
 			bitmap.Save(outputLocation, ImageFormat.Png);
-
-			Console.WriteLine("Total time: {0}", stopwatch.ElapsedMilliseconds);
+			
+			Console.WriteLine("Total time: {0}", stopwatchTotal.ElapsedMilliseconds);
 		}
 
 		private static Color GetColorForBiomeKind(BiomeKind biome)
