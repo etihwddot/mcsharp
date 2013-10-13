@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace MCSharp.ConsoleApp
 {
@@ -64,16 +65,28 @@ namespace MCSharp.ConsoleApp
 						int xOffset = (chunk.XPosition.Value * blocksPerChunk) - (bounds.minX * regionSize);
 						int zOffset = (chunk.ZPosition.Value * blocksPerChunk) - (bounds.minZ * regionSize);
 
+
 						for (int x = 0; x < blocksPerChunk; x++)
 						{
+							int? lastHeight = null;
 							for (int z = 0; z < blocksPerChunk; z++)
 							{
 								int imageX = x + xOffset;
 								int imageY = z + zOffset;
 
 								BiomeKind biome = chunk.GetBiome(x, z);
+
+								int height = chunk.GetHeight(x, z);
+
 								Color color = GetColorForBiomeKind(biome);
+
+								if (lastHeight.HasValue && height > lastHeight)
+									color = ControlPaint.Light(color);
+								if (lastHeight.HasValue && height < lastHeight)
+									color = ControlPaint.Dark(color);
+
 								bitmapWriter.SetPixel(imageX, imageY, color);
+								lastHeight = height;
 							}
 						}
 

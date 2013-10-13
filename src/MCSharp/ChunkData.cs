@@ -43,11 +43,23 @@ namespace MCSharp
 
 		public BiomeKind GetBiome(int chunkX, int chunkZ)
 		{
-			int index = chunkZ * Constants.ChunkSize + chunkX;
 			if (m_biomes == null)
 				return BiomeKind.Uncalculated;
 
-			return (BiomeKind) m_biomes.Bytes[index];
+			return (BiomeKind) m_biomes.Bytes[LocationToIndex(chunkX, chunkZ)];
+		}
+
+		private static int LocationToIndex(int chunkX, int chunkZ)
+		{
+			return chunkZ * Constants.ChunkSize + chunkX;
+		}
+
+		public int GetHeight(int chunkX, int chunkZ)
+		{
+			if (m_heightMap == null)
+				return -1;
+
+			return m_heightMap[LocationToIndex(chunkX, chunkZ)];
 		}
 
 		private void Initialize()
@@ -70,6 +82,9 @@ namespace MCSharp
 				case "zPos":
 					m_zPosition = ((NbtInt) tag).Value;
 					break;
+				case "HeightMap":
+					m_heightMap = (NbtIntArray) tag;
+					break;
 				}
 			}
 		}
@@ -85,5 +100,6 @@ namespace MCSharp
 		NbtByteArray m_biomes;
 		int? m_xPosition;
 		int? m_zPosition;
+		NbtIntArray m_heightMap;
 	}
 }
