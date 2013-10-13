@@ -28,10 +28,21 @@ namespace MCSharp.ConsoleApp
 				.ToList();
 
 			// sorry Todd; couldn't resist. :-)
-			var bounds = new { minX = int.MaxValue, maxX = int.MinValue, minZ = int.MaxValue, maxZ = int.MinValue };
+			var bounds = new
+			{
+				minX = int.MaxValue,
+				maxX = int.MinValue,
+				minZ = int.MaxValue,
+				maxZ = int.MinValue
+			};
 			bounds = regions.Aggregate(bounds,
-				(acc, r) => new { minX = Math.Min(acc.minX, r.RegionX), maxX = Math.Max(acc.maxX,
-					r.RegionX), minZ = Math.Min(acc.minZ, r.RegionZ), maxZ = Math.Max(acc.maxZ, r.RegionZ) });
+				(acc, r) => new
+				{
+					minX = Math.Min(acc.minX, r.RegionX),
+					maxX = Math.Max(acc.maxX, r.RegionX),
+					minZ = Math.Min(acc.minZ, r.RegionZ),
+					maxZ = Math.Max(acc.maxZ, r.RegionZ)
+				});
 
 			int xRegionCount = bounds.maxX - bounds.minX + 1;
 			int zRegionCount = bounds.maxZ - bounds.minZ + 1;
