@@ -49,6 +49,7 @@
     <Compile Include="ChunkInfo.cs" />
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="GameSaveData.cs" />
     <Compile Include="NamedBinaryTag\Nbt.cs" />
     <Compile Include="NamedBinaryTag\NbtDouble.cs" />
     <Compile Include="NamedBinaryTag\NbtFloat.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="NamedBinaryTag\NbtValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionFile.cs" />
+    <Compile Include="WorldBounds.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

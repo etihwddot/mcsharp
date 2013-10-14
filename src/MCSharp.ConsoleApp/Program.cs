@@ -13,42 +13,20 @@ namespace MCSharp.ConsoleApp
 	{
 		static void Main(string[] args)
 		{
-			string regionDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping\region");
+			string saveFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping");
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
-			
-			List<RegionFile> regions = Directory.GetFiles(regionDirectory, "*.mca")
-				.Select(x => new RegionFile(x))
-				.ToList();
 
-			// sorry Todd; couldn't resist. :-)
-			var bounds = new
-			{
-				minX = int.MaxValue,
-				maxX = int.MinValue,
-				minZ = int.MaxValue,
-				maxZ = int.MinValue
-			};
-			bounds = regions.Aggregate(bounds,
-				(acc, r) => new
-				{
-					minX = Math.Min(acc.minX, r.RegionX),
-					maxX = Math.Max(acc.maxX, r.RegionX),
-					minZ = Math.Min(acc.minZ, r.RegionZ),
-					maxZ = Math.Max(acc.maxZ, r.RegionZ)
-				});
-
-			int xRegionCount = bounds.maxX - bounds.minX + 1;
-			int zRegionCount = bounds.maxZ - bounds.minZ + 1;
+			GameSaveData save = GameSaveData.Load(saveFolder);
 
 			int? originXOffset = null;
 			int? originZOffset = null;
 
-			Bitmap bitmap = new Bitmap(Constants.RegionBlockWidth * xRegionCount, Constants.RegionBlockWidth * zRegionCount);
+			Bitmap bitmap = new Bitmap(save.Bounds.HorizontalBlockWidth, save.Bounds.VerticalBlockWidth);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
-				regions.AsParallel().ForAll(region =>
+				save.Regions.AsParallel().ForAll(region =>
 				{
 					string regionFileName = Path.GetFileName(region.FileName);
 
@@ -56,8 +34,8 @@ namespace MCSharp.ConsoleApp
 
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - (bounds.minX * Constants.RegionBlockWidth);
-						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - (bounds.minZ * Constants.RegionBlockWidth);
+						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.TopBlock;
+						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.LeftBlock;
 
 
 						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
