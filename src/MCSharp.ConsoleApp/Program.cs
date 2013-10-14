@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace MCSharp.ConsoleApp
 {
@@ -37,7 +36,6 @@ namespace MCSharp.ConsoleApp
 						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.LeftBlock;
 						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.TopBlock;
 
-
 						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 						{
 							int? lastHeight = null;
@@ -53,9 +51,9 @@ namespace MCSharp.ConsoleApp
 								Color color = GetColorForBiomeKind(biome);
 
 								if (lastHeight.HasValue && height > lastHeight)
-									color = ControlPaint.Light(color);
+									color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
 								if (lastHeight.HasValue && height < lastHeight)
-									color = ControlPaint.Dark(color, 0.1f);
+									color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
 
 								bitmapWriter.SetPixel(imageX, imageY, color);
 								lastHeight = height;
@@ -86,6 +84,17 @@ namespace MCSharp.ConsoleApp
 			bitmap.Save(outputLocation, ImageFormat.Png);
 			
 			Console.WriteLine("Total time: {0}", stopwatchTotal.ElapsedMilliseconds);
+		}
+
+		private static Color BlendWith(Color background, Color overlay)
+		{
+			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
+			var alpha = overlay.A / 256.0;
+
+			var blendedR = (byte) (overlay.R * alpha + background.R * (1 - alpha));
+			var blendedG = (byte) (overlay.G * alpha + background.G * (1 - alpha));
+			var blendedB = (byte) (overlay.B * alpha + background.B * (1 - alpha));
+			return Color.FromArgb(blendedR, blendedG, blendedB);
 		}
 
 		private static Color GetColorForBiomeKind(BiomeKind biome)
