@@ -34,8 +34,8 @@ namespace MCSharp.ConsoleApp
 
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.TopBlock;
-						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.LeftBlock;
+						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.LeftBlock;
+						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.TopBlock;
 
 
 						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
