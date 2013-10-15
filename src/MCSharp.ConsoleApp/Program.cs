@@ -12,17 +12,23 @@ namespace MCSharp.ConsoleApp
 	{
 		static void Main(string[] args)
 		{
-			string saveFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft\saves\Mapping");
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 
-			GameSaveData save = GameSaveData.Load(saveFolder);
+			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping");
+			if (saveInfo == null)
+			{
+				Console.WriteLine("Unable to load save.");
+				return;
+			}
+
+			GameSave save = GameSave.Load(saveInfo);
 
 			int? originXOffset = null;
 			int? originZOffset = null;
 
-			Bitmap bitmap = new Bitmap(save.Bounds.HorizontalBlockWidth, save.Bounds.VerticalBlockWidth);
+			Bitmap bitmap = new Bitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
 				save.Regions.AsParallel().ForAll(region =>
@@ -33,8 +39,8 @@ namespace MCSharp.ConsoleApp
 
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.LeftBlock;
-						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.TopBlock;
+						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
+						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
 
 						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 						{

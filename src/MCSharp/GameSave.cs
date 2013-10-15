@@ -5,27 +5,27 @@ using System.Linq;
 
 namespace MCSharp
 {
-	public sealed class GameSaveData
+	public sealed class GameSave
 	{
-		public static GameSaveData Load(string folder)
+		public static GameSave Load(GameSaveInfo info)
 		{
 			// load regions
-			string regionFolderPath = Path.Combine(folder, c_regionFolderName);
+			string regionFolderPath = Path.Combine(info.Location, c_regionFolderName);
 			ReadOnlyCollection<RegionFile> regions = Directory.GetFiles(regionFolderPath, c_regionExtension)
 				.Select(x => new RegionFile(x))
 				.ToList().AsReadOnly();
 
 			// calculate region
-			WorldBounds bounds = new WorldBounds(int.MaxValue, int.MinValue, int.MinValue, int.MaxValue);
+			GameSaveBounds bounds = new GameSaveBounds(int.MaxValue, int.MinValue, int.MinValue, int.MaxValue);
 
 			bounds = regions.Aggregate(bounds,
-				(acc, r) => new WorldBounds(
-					Math.Min(acc.Top, r.RegionZ),
-					Math.Max(acc.Right, r.RegionX),
-					Math.Max(acc.Bottom, r.RegionZ),
-					Math.Min(acc.Left, r.RegionX)));
+				(acc, r) => new GameSaveBounds(
+					Math.Min(acc.MinZ, r.RegionZ),
+					Math.Max(acc.MaxX, r.RegionX),
+					Math.Max(acc.MaxZ, r.RegionZ),
+					Math.Min(acc.MinX, r.RegionX)));
 						
-			return new GameSaveData(regions, bounds);
+			return new GameSave(regions, bounds);
 		}
 
 		public ReadOnlyCollection<RegionFile> Regions
@@ -33,12 +33,12 @@ namespace MCSharp
 			get { return m_regions; }
 		}
 
-		public WorldBounds Bounds
+		public GameSaveBounds Bounds
 		{
 			get { return m_bounds; }
 		}
 
-		private GameSaveData(ReadOnlyCollection<RegionFile> regions, WorldBounds bounds)
+		private GameSave(ReadOnlyCollection<RegionFile> regions, GameSaveBounds bounds)
 		{
 			m_bounds = bounds;
 			m_regions = regions;
@@ -47,7 +47,7 @@ namespace MCSharp
 		const string c_regionFolderName = "region";
 		const string c_regionExtension = "*.mca";
 
-		WorldBounds m_bounds;
+		GameSaveBounds m_bounds;
 		ReadOnlyCollection<RegionFile> m_regions;
 	}
 }

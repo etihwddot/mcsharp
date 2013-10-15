@@ -1,4 +1,6 @@
-﻿namespace MCSharp
+﻿using System;
+using System.IO;
+namespace MCSharp
 {
 	public static class Constants
 	{
@@ -26,5 +28,7 @@
 		/// Number of bytes in a region file sector
 		/// </summary>
 		public static readonly int RegionFileSectorSize = 4096;
+
+		public static readonly string MinecraftPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @".minecraft");
 	}
 }

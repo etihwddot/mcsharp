@@ -2,15 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.IO.Compression;
+using Logos.Utility.IO;
 using MCSharp.NamedBinaryTag;
+using Logos.Utility;
 
 namespace MCSharp
 {
-	public sealed class NbtReader
+	public sealed class NbtReader : IDisposable
 	{
-		public NbtReader(BinaryReader reader)
+		public NbtReader(Stream stream)
+			: this(stream, NbtCompressionType.GZip)
+		{	
+		}
+
+		public NbtReader(Stream stream, NbtCompressionType compressionType)
 		{
-			m_reader = reader;
+			m_stream = stream;
+			m_compressedStream = GetDecompressionStream(compressionType, stream);
+			m_reader = new BinaryReader(m_compressedStream);
 		}
 
 		public Nbt ReadTag()
@@ -21,6 +31,26 @@ namespace MCSharp
 
 			string name = ReadString();
 			return ReadTagForKind(kind, name);
+		}
+
+		public void Dispose()
+		{
+			DisposableUtility.Dispose(ref m_reader);
+			DisposableUtility.Dispose(ref m_compressedStream);
+			DisposableUtility.Dispose(ref m_stream);
+		}
+
+		private static Stream GetDecompressionStream(NbtCompressionType type, Stream stream)
+		{
+			if (type == NbtCompressionType.GZip)
+				return new GZipStream(stream, CompressionMode.Decompress, true);
+
+			// skip 2 bytes see http://george.chiramattel.com/blog/2007/09/deflatestream-block-length-does-not-match.html
+			byte[] dataFormat = stream.ReadExactly(2);
+			if ((dataFormat[0] & 0xF) != 8)
+				throw new InvalidOperationException();
+
+			return new DeflateStream(stream, CompressionMode.Decompress, true);
 		}
 
 		private Nbt ReadTagForKind(NbtKind kind, string name)
@@ -139,6 +169,8 @@ namespace MCSharp
 			return new NbtIntArray(name, values);
 		}
 
+		Stream m_stream;
+				Stream m_compressedStream;
 		BinaryReader m_reader;
 	}
 }

@@ -47,16 +47,13 @@ namespace MCSharp
 
 					// get the size and type of the compressed chunk data
 					int compressedSize = reader.ReadBigEndianInt32();
-					ChunkCompressionType compressionType = (ChunkCompressionType) reader.ReadByte();
+					NbtCompressionType compressionType = (NbtCompressionType) reader.ReadByte();
 					byte[] compressedData = reader.ReadBytes(compressedSize - 1);
 
 					NbtCompound root;
 					using (MemoryStream memoryStream = new MemoryStream(compressedData))
-					using (Stream chunkDataStream = GetDecompressionStream(compressionType, memoryStream))
-					using (BinaryReader chunkDataReader = new BinaryReader(chunkDataStream))
+					using (NbtReader nbtReader = new NbtReader(memoryStream, compressionType))
 					{
-						NbtReader nbtReader = new NbtReader(chunkDataReader);
-
 						root = (NbtCompound) nbtReader.ReadTag();
 
 						// verify we read all of the compressed data
@@ -67,19 +64,6 @@ namespace MCSharp
 					yield return ChunkData.Create(chunk, root);
 				}
 			}
-		}
-
-		private static Stream GetDecompressionStream(ChunkCompressionType type, Stream stream)
-		{
-			if (type == ChunkCompressionType.GZip)
-				return new GZipStream(stream, CompressionMode.Decompress, true);
-
-			// skip 2 bytes see http://george.chiramattel.com/blog/2007/09/deflatestream-block-length-does-not-match.html
-			byte[] dataFormat = stream.ReadExactly(2);
-			if ((dataFormat[0] & 0xF) != 8)
-				throw new InvalidOperationException();
-
-			return new DeflateStream(stream, CompressionMode.Decompress, true);
 		}
 
 		string m_regionsPath;
