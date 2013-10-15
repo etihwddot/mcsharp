@@ -14,6 +14,7 @@ namespace MCSharp
 
 			foreach (string saveFolder in Directory.GetDirectories(savesPath))
 			{
+				// see http://minecraft.gamepedia.com/Level_format#level.dat_format
 				string levelDataPath = Path.Combine(saveFolder, "level.dat");
 
 				using (FileStream stream = File.OpenRead(levelDataPath))
