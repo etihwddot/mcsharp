@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace MCSharp.WorldBrowser.ViewModels
 {
-	public sealed class MainWindowModel
+	public sealed class MainWindowModel : ViewModel
 	{
+
 	}
 }
