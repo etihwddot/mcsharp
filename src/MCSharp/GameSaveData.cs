@@ -11,7 +11,7 @@ namespace MCSharp
 		{
 			// load regions
 			string regionFolderPath = Path.Combine(folder, c_regionFolderName);
-			ReadOnlyCollection<RegionFile> regions = Directory.GetFiles(regionFolderPath, "*.mca")
+			ReadOnlyCollection<RegionFile> regions = Directory.GetFiles(regionFolderPath, c_regionExtension)
 				.Select(x => new RegionFile(x))
 				.ToList().AsReadOnly();
 
@@ -45,7 +45,7 @@ namespace MCSharp
 		}
 
 		const string c_regionFolderName = "region";
-		const string c_regionExtension = "mca";
+		const string c_regionExtension = "*.mca";
 
 		WorldBounds m_bounds;
 		ReadOnlyCollection<RegionFile> m_regions;
