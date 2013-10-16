@@ -2,10 +2,40 @@
 	x:Class="MCSharp.WorldBrowser.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mcs="clr-namespace:MCSharp;assembly=MCSharp"
     Title="World Browser"
+	FontSize="12pt"
 	Height="600"
 	Width="800">
-    <Grid>
-        
-    </Grid>
+	
+	<Window.Resources>
+		<DataTemplate DataType="{x:Type mcs:GameSaveInfo}">
+			<StackPanel>
+				<TextBlock>
+					<Run Text="{Binding Name, Mode=OneWay}" />
+					<Span Foreground="#666666">
+						<Run Text="(" /><Run Text="{Binding FolderName, Mode=OneWay}" /><Run Text=")" />
+					</Span>
+				</TextBlock>
+			</StackPanel>
+		</DataTemplate>
+	</Window.Resources>
+	
+    <Grid Margin="8">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		
+		<StackPanel>
+			<TextBlock
+				Text="Save:"
+				Margin="0,0,4,0" />
+			<ComboBox
+				HorizontalAlignment="Left"
+				Width="300"
+				SelectedItem="{Binding SelectedSave}"
+				ItemsSource="{Binding AvailableSaves}" />
+		</StackPanel>
+	</Grid>
 </Window>

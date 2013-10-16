@@ -33,6 +33,11 @@ namespace MCSharp
 			get { return m_name; }
 		}
 
+		public string FolderName
+		{
+			get { return Path.GetFileName(m_location); }
+		}
+
 		public string Location
 		{
 			get { return m_location; }
