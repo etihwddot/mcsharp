@@ -27,10 +27,12 @@ namespace MCSharp.WorldBrowser.ViewModels
 		{
 			get
 			{
+				VerifyAccess();
 				return m_selectedSave;
 			}
 			set
 			{
+				VerifyAccess();
 				if (value != m_selectedSave)
 				{
 					m_selectedSave = value;
@@ -45,6 +47,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 		{
 			get
 			{
+				VerifyAccess();
 				return m_image;
 			}
 		}
