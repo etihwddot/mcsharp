@@ -38,8 +38,8 @@ namespace MCSharp.ConsoleApp
 					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
 					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
 
-					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
-						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+					for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 							heightMap[z + zOffset, x + xOffset] = chunk.GetHeight(x, z);
 				}
 			});
@@ -60,9 +60,9 @@ namespace MCSharp.ConsoleApp
 						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
 
 
-						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 						{
-							for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+							for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 							{
 								int imageX = x + xOffset;
 								int imageY = z + zOffset;
@@ -177,6 +177,8 @@ namespace MCSharp.ConsoleApp
 					return rng.Next(31) < 30 ? Color.Green : Color.Yellow;
 
 				case BiomeKind.Plains: return Color.Green;
+				case BiomeKind.FlowerForest: return Color.Green; // TODO: add flowers
+				case BiomeKind.BirchForest: return Color.DarkSeaGreen;
 				case BiomeKind.Forest: return Color.DarkGreen;
 				case BiomeKind.ForestHills: return Color.DarkGreen;
 				case BiomeKind.ExtremeHills: return Color.DarkGray;
@@ -193,6 +195,7 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.DesertHills: return Color.FromArgb(0xDB, 0xD3, 0xA0);
 				case BiomeKind.ColdTaiga: return Color.White;
 				case BiomeKind.ColdTaigaHills: return Color.WhiteSmoke;
+				case BiomeKind.MegaTaiga: return Color.ForestGreen;
 				case BiomeKind.Taiga: return Color.ForestGreen;
 				case BiomeKind.TaigaHills: return Color.ForestGreen;
 				case BiomeKind.IcePlains: return Color.White;
