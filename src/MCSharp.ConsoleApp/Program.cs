@@ -16,7 +16,8 @@ namespace MCSharp.ConsoleApp
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 
-			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping");
+			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
+			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
 			{
 				Console.WriteLine("Unable to load save.");
@@ -28,6 +29,21 @@ namespace MCSharp.ConsoleApp
 			int? originXOffset = null;
 			int? originZOffset = null;
 
+			int[,] heightMap = new int[save.Bounds.BlockHeight, save.Bounds.BlockWidth];
+
+			save.Regions.AsParallel().ForAll(region =>
+			{
+				foreach (ChunkData chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
+				{
+					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
+					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
+
+					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+							heightMap[z + zOffset, x + xOffset] = chunk.GetHeight(x, z);
+				}
+			});
+			
 			Bitmap bitmap = new Bitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
@@ -37,14 +53,15 @@ namespace MCSharp.ConsoleApp
 
 					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
+
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
 						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
 						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
 
+
 						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 						{
-							int? lastHeight = null;
 							for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 							{
 								int imageX = x + xOffset;
@@ -52,17 +69,60 @@ namespace MCSharp.ConsoleApp
 
 								BiomeKind biome = chunk.GetBiome(x, z);
 
-								int height = chunk.GetHeight(x, z);
+								double hillshade = 0;
+								if (imageX > 0 && imageX < save.Bounds.BlockWidth - 1 &&
+									imageY > 0 && imageY < save.Bounds.BlockHeight - 1)
+								{
+									double a = heightMap[imageY - 1, imageX - 1];
+									double b = heightMap[imageY - 1, imageX];
+									double c = heightMap[imageY - 1, imageX + 1];
+									double d = heightMap[imageY, imageX - 1];
+									double e = heightMap[imageY, imageX];
+									double f = heightMap[imageY, imageX + 1];
+									double g = heightMap[imageY + 1, imageX - 1];
+									double h = heightMap[imageY + 1, imageX];
+									double i = heightMap[imageY + 1, imageX + 1];
+
+									// compute hillshade
+									const int cellsize = 4; // no idea what this is...
+									const double zFactor = 0.25; // no idea what this is...
+
+									double dzOverDx = ((c + 2 * f + i) - (a + 2 * d + g)) / 8 * cellsize;
+									double dzOverDy = ((g + 2 * h + i) - (a + 2 * b + c)) / 8 * cellsize;
+
+									double slopeRad = Math.Atan(zFactor * Math.Sqrt(Math.Pow(dzOverDx, 2) + Math.Pow(dzOverDy, 2)));
+									double aspectRad = 0;
+									if (dzOverDx != 0)
+									{
+										aspectRad = Math.Atan2(dzOverDy, -dzOverDx);
+										if (aspectRad < 0)
+											aspectRad = 2 * Math.PI + aspectRad;
+									}
+									else if (dzOverDx == 0)
+									{
+										if (dzOverDy > 0)
+											aspectRad = Math.PI / 2.0;
+										else if (dzOverDy < 0)
+											aspectRad = 2 * Math.PI - Math.PI / 2;
+										else
+											aspectRad = aspectRad;
+									}
+
+									hillshade = 255.0 * ((Math.Cos(c_zenithRadians) * Math.Cos(slopeRad)) + (Math.Sin(c_zenithRadians) * Math.Sin(slopeRad) * Math.Cos(c_azimuthRadians - aspectRad)));
+									if (hillshade < 0)
+										hillshade = 0;
+								}
+
+								hillshade = (int)hillshade;
+
 
 								Color color = GetColorForBiomeKind(biome);
+								Color overlay = Color.FromArgb(150, (int)hillshade, (int)hillshade, (int)hillshade);
 
-								if (lastHeight.HasValue && height > lastHeight)
-									color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
-								if (lastHeight.HasValue && height < lastHeight)
-									color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
+								if (hillshade == 180)
+									overlay = Color.FromArgb(100, (int)hillshade, (int)hillshade, (int)hillshade);
 
-								bitmapWriter.SetPixel(imageX, imageY, color);
-								lastHeight = height;
+								bitmapWriter.SetPixel(imageX, imageY, BlendWith(color, overlay));
 							}
 						}
 
@@ -86,9 +146,9 @@ namespace MCSharp.ConsoleApp
 				g.DrawLine(new Pen(Color.Black, 3.5f), originXOffset.Value + markerSize, originZOffset.Value - markerSize, originXOffset.Value - markerSize, originZOffset.Value + markerSize);
 				g.DrawLine(new Pen(Color.Yellow, 2.5f), originXOffset.Value + markerSize, originZOffset.Value - markerSize, originXOffset.Value - markerSize, originZOffset.Value + markerSize);
 			}
-			
+
 			bitmap.Save(outputLocation, ImageFormat.Png);
-			
+
 			Console.WriteLine("Total time: {0}", stopwatchTotal.ElapsedMilliseconds);
 		}
 
@@ -97,25 +157,25 @@ namespace MCSharp.ConsoleApp
 			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
 			var alpha = overlay.A / 256.0;
 
-			var blendedR = (byte) (overlay.R * alpha + background.R * (1 - alpha));
-			var blendedG = (byte) (overlay.G * alpha + background.G * (1 - alpha));
-			var blendedB = (byte) (overlay.B * alpha + background.B * (1 - alpha));
+			var blendedR = (byte)(overlay.R * alpha + background.R * (1 - alpha));
+			var blendedG = (byte)(overlay.G * alpha + background.G * (1 - alpha));
+			var blendedB = (byte)(overlay.B * alpha + background.B * (1 - alpha));
 			return Color.FromArgb(blendedR, blendedG, blendedB);
 		}
 
 		private static Color GetColorForBiomeKind(BiomeKind biome)
 		{
 			switch (biome)
-			{ 
+			{
 				case BiomeKind.Uncalculated: return Color.Black;
 				case BiomeKind.DeepOcean: return Color.DarkBlue;
 				case BiomeKind.Ocean: return Color.Blue;
 				case BiomeKind.River: return Color.LightBlue;
 				case BiomeKind.Beach: return Color.LightYellow;
-				
+
 				case BiomeKind.SunflowerPlains:
 					return rng.Next(31) < 30 ? Color.Green : Color.Yellow;
-				
+
 				case BiomeKind.Plains: return Color.Green;
 				case BiomeKind.Forest: return Color.DarkGreen;
 				case BiomeKind.ForestHills: return Color.DarkGreen;
@@ -141,7 +201,7 @@ namespace MCSharp.ConsoleApp
 				case BiomeKind.FrozenOcean: return Color.CornflowerBlue;
 				case BiomeKind.ColdBeach: return Color.Beige;
 				case BiomeKind.StoneBeach: return Color.DarkGray;
-				
+
 				// RoofedForest has mushrooms; randomly add some red and tan pixels
 				case BiomeKind.RoofedForest:
 					int value = rng.Next(100);
@@ -149,6 +209,18 @@ namespace MCSharp.ConsoleApp
 				default: return Color.Red;
 			}
 		}
+
+		// hillshading setup
+
+		// illumination angle
+		const double c_altitudeDegrees = 45.0;
+		const double c_zenithDegrees = 90.0 - c_altitudeDegrees;
+		const double c_zenithRadians = c_zenithDegrees * Math.PI / 180.0;
+
+		// illumination direction
+		const double c_azimuthDegrees = 315.0;
+		const double c_azimuthMathDegrees = 360.0 - c_azimuthDegrees + 90.0; // no idea why it's called azimuth math; see http://edndoc.esri.com/arcobjects/9.2/net/shared/geoprocessing/spatial_analyst_tools/how_hillshade_works.htm
+		const double c_azimuthRadians = c_azimuthMathDegrees * Math.PI / 180.0;
 
 		private static Random rng = new Random();
 	}
