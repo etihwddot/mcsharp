@@ -37,5 +37,9 @@
 				SelectedItem="{Binding SelectedSave}"
 				ItemsSource="{Binding AvailableSaves}" />
 		</StackPanel>
+		
+		<Image
+			Grid.Row="1"
+			Source="{Binding Image}" />
 	</Grid>
 </Window>
