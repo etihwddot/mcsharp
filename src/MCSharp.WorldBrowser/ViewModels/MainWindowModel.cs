@@ -98,11 +98,11 @@ namespace MCSharp.WorldBrowser.ViewModels
 		private static Color BlendWith(Color background, Color overlay)
 		{
 			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-			var alpha = overlay.A / 256.0;
+			double alpha = overlay.A / 256.0;
 
-			var blendedR = (byte) (overlay.R * alpha + background.R * (1 - alpha));
-			var blendedG = (byte) (overlay.G * alpha + background.G * (1 - alpha));
-			var blendedB = (byte) (overlay.B * alpha + background.B * (1 - alpha));
+			byte blendedR = (byte) (overlay.R * alpha + background.R * (1 - alpha));
+			byte blendedG = (byte) (overlay.G * alpha + background.G * (1 - alpha));
+			byte blendedB = (byte) (overlay.B * alpha + background.B * (1 - alpha));
 			return Color.FromRgb(blendedR, blendedG, blendedB);
 		}
 
