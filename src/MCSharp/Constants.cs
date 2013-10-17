@@ -20,7 +20,7 @@ namespace MCSharp
 		public static readonly int RegionChunkWidth = 32;
 
 		/// <summary>
-		/// Number of chunks wide a region is
+		/// Number of blocks wide a region is
 		/// </summary>
 		public static readonly int RegionBlockWidth = RegionChunkWidth * ChunkBlockWidth;
 		

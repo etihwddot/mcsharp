@@ -19,6 +19,11 @@ namespace MCSharp.WorldBrowser.ViewModels
 				handler(this, new PropertyChangedEventArgs(property));
 		}
 
+		public Dispatcher Dispatcher
+		{
+			get { return m_dispatcher; }
+		}
+
 		protected void VerifyAccess()
 		{
 			m_dispatcher.VerifyAccess();

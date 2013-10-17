@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -61,24 +62,23 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
-			
-			foreach (RegionFile region in save.Regions)
+
+			save.Regions.AsParallel().ForAll(region =>
 			{
 				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
+				Byte[] bytes = new Byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
+
 				foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 				{
-					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
-					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
+					int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
+					int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
 
 					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 					{
 						int? lastHeight = null;
 						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 						{
-							int imageX = x + xOffset;
-							int imageY = z + zOffset;
-
 							BiomeKind biome = chunk.GetBiome(x, z);
 
 							int height = chunk.GetHeight(x, z);
@@ -90,12 +90,27 @@ namespace MCSharp.WorldBrowser.ViewModels
 							if (lastHeight.HasValue && height < lastHeight)
 								color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-							m_image.WritePixels(new Int32Rect(imageX, imageY, 1, 1), new byte[] { color.B, color.G, color.R, color.A }, 4, 0);
+							int pixelStart = (x + xOffset + ((z + zOffset) * Constants.RegionBlockWidth)) * s_bytesPerPixel;
+							bytes[pixelStart] = color.B;
+							bytes[pixelStart + 1] = color.G;
+							bytes[pixelStart + 2] = color.R;
+							bytes[pixelStart + 3] = color.A;
+
 							lastHeight = height;
 						}
 					}
 				}
-			}
+
+				Action action = () => 
+					{
+						int regionXOffset = region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
+						int regionZOffset = region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+
+						Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
+						m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
+					};
+				Dispatcher.BeginInvoke(action);
+			});
 		}
 
 		private static Color BlendWith(Color background, Color overlay)
@@ -158,6 +173,8 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		static readonly Random s_random = new Random();
 		static readonly PixelFormat s_pixelFormat = PixelFormats.Bgra32;
+		static readonly int s_bytesPerPixel = s_pixelFormat.BitsPerPixel / 8;
+
 		const int c_imageDpi = 96;
 
 		GameSaveInfo m_selectedSave;
