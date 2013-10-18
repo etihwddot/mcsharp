@@ -111,10 +111,11 @@ namespace MCSharp.WorldBrowser.ViewModels
 					// Stop if canceled in middle of chunk processing
 					token.ThrowIfCancellationRequested();
 
-					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+					for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 					{
 						int? lastHeight = null;
-						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+						
+						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 						{
 							BiomeKind biome = chunk.GetBiome(x, z);
 
