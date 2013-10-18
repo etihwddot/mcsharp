@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 
@@ -8,6 +10,11 @@ namespace MCSharp.WorldBrowser.Views
 	[ContentProperty("Content")]
 	public sealed class PanZoomControl : FrameworkElement
 	{
+		public PanZoomControl()
+		{
+			m_scaleTransform = new ScaleTransform();
+		}
+
 		public UIElement Content
 		{
 			get
@@ -26,8 +33,12 @@ namespace MCSharp.WorldBrowser.Views
 
 				if (m_content != null)
 				{
+					m_scaleTransform.ScaleX = 1;
+					m_scaleTransform.ScaleY = 1;
+
 					AddLogicalChild(m_content);
 					AddVisualChild(m_content);
+					m_content.RenderTransform = m_scaleTransform;
 				}
 			}
 		}
@@ -65,6 +76,30 @@ namespace MCSharp.WorldBrowser.Views
 			return m_content.RenderSize;
 		}
 
+		protected override void OnRender(DrawingContext drawingContext)
+		{
+			drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
+		}
+
+		protected override void OnMouseWheel(MouseWheelEventArgs e)
+		{
+			Point mousePoint = e.GetPosition(this);
+
+			if (e.Delta > 0)
+			{
+				m_scaleTransform.ScaleX += c_scaleIncrement;
+				m_scaleTransform.ScaleY += c_scaleIncrement;
+			}
+			else
+			{
+				m_scaleTransform.ScaleX = Math.Max(1, m_scaleTransform.ScaleX - c_scaleIncrement);
+				m_scaleTransform.ScaleY = Math.Max(1, m_scaleTransform.ScaleY - c_scaleIncrement);
+			}
+		}
+
+		const double c_scaleIncrement = 0.5;
+
 		UIElement m_content;
+		ScaleTransform m_scaleTransform;
 	}
 }
