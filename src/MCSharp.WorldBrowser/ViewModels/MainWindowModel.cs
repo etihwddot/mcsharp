@@ -73,7 +73,13 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			var tasks = save.Regions.Select(r => RenderRegionAsync(save, r, m_source.Token));
 
-			await Task.WhenAll(tasks);
+			try
+			{
+				await Task.WhenAll(tasks);
+			}
+			catch (OperationCanceledException)
+			{
+			}
 
 			// update status to say we're done
 		}
@@ -81,10 +87,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 		private async Task RenderRegionAsync(GameSave save, RegionFile region, CancellationToken token)
 		{
 			var bytes = await GetRegionBytesAsync(region, token);
-
-			if (token.IsCancellationRequested)
-				return;
-
+			
 			int regionXOffset = region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
 			int regionZOffset = region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
 
@@ -105,9 +108,8 @@ namespace MCSharp.WorldBrowser.ViewModels
 					int xOffset = chunk.Info.ChunkX*Constants.ChunkBlockWidth;
 					int zOffset = chunk.Info.ChunkZ*Constants.ChunkBlockWidth;
 
-					// support cancellation
-					if (token.IsCancellationRequested)
-						return bytes;
+					// Stop if canceled in middle of chunk processing
+					token.ThrowIfCancellationRequested();
 
 					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 					{
