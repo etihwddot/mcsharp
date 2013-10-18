@@ -86,7 +86,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		private async Task RenderRegionAsync(GameSave save, RegionFile region, CancellationToken token)
 		{
-			var bytes = await GetRegionBytesAsync(region, token);
+			byte[] bytes = await GetRegionBytesAsync(region, token);
 			
 			int regionXOffset = region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
 			int regionZOffset = region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
