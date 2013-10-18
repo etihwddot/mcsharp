@@ -13,6 +13,7 @@ namespace MCSharp.WorldBrowser.Views
 		public PanZoomControl()
 		{
 			m_scaleTransform = new ScaleTransform();
+			m_translateTransform = new TranslateTransform();
 		}
 
 		public UIElement Content
@@ -38,7 +39,10 @@ namespace MCSharp.WorldBrowser.Views
 
 					AddLogicalChild(m_content);
 					AddVisualChild(m_content);
-					m_content.RenderTransform = m_scaleTransform;
+					TransformGroup transformGroup = new TransformGroup();
+					transformGroup.Children.Add(m_scaleTransform);
+					transformGroup.Children.Add(m_translateTransform);
+					m_content.RenderTransform = transformGroup;
 				}
 			}
 		}
@@ -97,9 +101,49 @@ namespace MCSharp.WorldBrowser.Views
 			}
 		}
 
+		protected override void OnMouseEnter(MouseEventArgs e)
+		{
+			Mouse.OverrideCursor = Cursors.SizeAll;
+		}
+
+		protected override void OnMouseLeave(MouseEventArgs e)
+		{
+			Mouse.OverrideCursor = null;
+		}
+
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			m_captureStart = e.GetPosition(this);
+			m_transformXStart = m_translateTransform.X;
+			m_transformYStart = m_translateTransform.Y;
+			Mouse.Capture(this);
+			e.Handled = true;
+		}
+
+		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+		{
+			Mouse.Capture(null);
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			if (Mouse.Captured == this)
+			{
+				Vector vector = e.GetPosition(this) - m_captureStart;
+
+				m_translateTransform.X = m_transformXStart + vector.X;
+				m_translateTransform.Y = m_transformYStart + vector.Y;
+			}
+		}
+
 		const double c_scaleIncrement = 0.5;
 
 		UIElement m_content;
 		ScaleTransform m_scaleTransform;
+		TranslateTransform m_translateTransform;
+		
+		Point m_captureStart;
+		double m_transformXStart;
+		double m_transformYStart;
 	}
 }
