@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Logos.Utility;
 
 namespace MCSharp.WorldBrowser.ViewModels
@@ -15,7 +17,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 		public MainWindowModel()
 		{
 			m_availableSaves = GameSaveInfo.GetAvailableSaves().ToList().AsReadOnly();
-			SelectedSave = m_availableSaves.FirstOrDefault();	
+			SelectedSave = m_availableSaves.FirstOrDefault();
 		}
 
 		public ReadOnlyCollection<GameSaveInfo> AvailableSaves
@@ -53,26 +55,59 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 		}
 
-		private void GenerateImage()
+		private async void GenerateImage()
 		{
 			if (m_selectedSave == null)
 				return;
+
+			// cancel existing work
+			if (m_source != null)
+				m_source.Cancel();
+
+			m_source = new CancellationTokenSource();
 
 			GameSave save = GameSave.Load(m_selectedSave);
 
 			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
-			save.Regions.AsParallel().ForAll(region =>
+			var tasks = save.Regions.Select(r => RenderRegionAsync(save, r, m_source.Token));
+
+			await Task.WhenAll(tasks);
+
+			// update status to say we're done
+		}
+
+		private async Task RenderRegionAsync(GameSave save, RegionFile region, CancellationToken token)
+		{
+			var bytes = await GetRegionBytesAsync(region, token);
+
+			if (token.IsCancellationRequested)
+				return;
+
+			int regionXOffset = region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
+			int regionZOffset = region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+
+			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
+			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
+		}
+
+		private static Task<byte[]> GetRegionBytesAsync(RegionFile region, CancellationToken token)
+		{
+			return Task.Run(() =>
 			{
 				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
-				Byte[] bytes = new Byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
+				Byte[] bytes = new Byte[Constants.RegionBlockWidth*Constants.RegionBlockWidth*s_bytesPerPixel];
 
 				foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 				{
-					int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
-					int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
+					int xOffset = chunk.Info.ChunkX*Constants.ChunkBlockWidth;
+					int zOffset = chunk.Info.ChunkZ*Constants.ChunkBlockWidth;
+
+					// support cancellation
+					if (token.IsCancellationRequested)
+						return bytes;
 
 					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 					{
@@ -90,7 +125,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 							if (lastHeight.HasValue && height < lastHeight)
 								color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-							int pixelStart = (x + xOffset + ((z + zOffset) * Constants.RegionBlockWidth)) * s_bytesPerPixel;
+							int pixelStart = (x + xOffset + ((z + zOffset)*Constants.RegionBlockWidth))*s_bytesPerPixel;
 							bytes[pixelStart] = color.B;
 							bytes[pixelStart + 1] = color.G;
 							bytes[pixelStart + 2] = color.R;
@@ -101,16 +136,8 @@ namespace MCSharp.WorldBrowser.ViewModels
 					}
 				}
 
-				Action action = () => 
-					{
-						int regionXOffset = region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
-						int regionZOffset = region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
-
-						Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
-						m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
-					};
-				Dispatcher.BeginInvoke(action);
-			});
+				return bytes;
+			}, token);
 		}
 
 		private static Color BlendWith(Color background, Color overlay)
@@ -177,6 +204,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		const int c_imageDpi = 96;
 
+		CancellationTokenSource m_source;
 		GameSaveInfo m_selectedSave;
 		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
 		WriteableBitmap m_image;
