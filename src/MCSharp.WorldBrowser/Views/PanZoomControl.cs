@@ -88,9 +88,10 @@ namespace MCSharp.WorldBrowser.Views
 
 		protected override void OnMouseWheel(MouseWheelEventArgs e)
 		{
+			// calculate initial bounds of content
+			// calculate the initial position of the mouse
 			Point mousePoint = e.GetPosition(this);
-			Rect contentBounds = VisualTreeHelper.GetContentBounds(m_content);
-			Rect initialBounds = m_scaleTransform.TransformBounds(contentBounds);
+			Point initialPoint = m_scaleTransform.Transform(mousePoint);
 			
 			if (e.Delta > 0)
 			{
@@ -103,13 +104,15 @@ namespace MCSharp.WorldBrowser.Views
 				m_scaleTransform.ScaleY = Math.Max(1, m_scaleTransform.ScaleY - c_scaleIncrement);
 			}
 
-			Rect finalBounds = m_scaleTransform.TransformBounds(contentBounds);
-			double widthChange = initialBounds.Width - finalBounds.Width;
-			double offsetWidthChange = widthChange / 2;
+			// calculate the new location of the mouse
+			Point finalMousePoint = m_scaleTransform.Transform(mousePoint);
+
+			double widthChange = initialPoint.X - finalMousePoint.X;
+			double offsetWidthChange = widthChange;
 			CoerceTranslateX(m_translateTransform.X + offsetWidthChange);
 
-			double heightChange = initialBounds.Height - finalBounds.Height;
-			double offsetHeightChange = heightChange / 2;
+			double heightChange = initialPoint.Y - finalMousePoint.Y;
+			double offsetHeightChange = heightChange;
 			CoerceTranslateY(m_translateTransform.Y + offsetHeightChange);
 		}
 
