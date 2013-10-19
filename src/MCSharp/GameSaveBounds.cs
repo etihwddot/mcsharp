@@ -38,12 +38,12 @@ namespace MCSharp
 
 		public int MaxXChunk
 		{
-			get { return m_minX+ ChunkWidth; }
+			get { return m_minX + ChunkWidth; }
 		}
 
 		public int MaxXBlock
 		{
-			get { return m_minX * BlockWidth; }
+			get { return m_minX + BlockWidth; }
 		}
 
 		public int MaxZ
