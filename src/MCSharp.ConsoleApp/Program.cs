@@ -14,8 +14,6 @@ namespace MCSharp.ConsoleApp
 		{
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
-			Stopwatch stopwatchTotal = Stopwatch.StartNew();
-
 			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
 			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
@@ -23,6 +21,13 @@ namespace MCSharp.ConsoleApp
 				Console.WriteLine("Unable to load save.");
 				return;
 			}
+
+			CreateHillShadeBitmap(outputLocation, saveInfo);
+		}
+
+		private static void CreateHillShadeBitmap(string outputLocation, GameSaveInfo saveInfo)
+		{
+			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 
 			GameSave save = GameSave.Load(saveInfo);
 
@@ -32,7 +37,7 @@ namespace MCSharp.ConsoleApp
 			int[,] heightMap = new int[save.Bounds.BlockHeight, save.Bounds.BlockWidth];
 
 			Stopwatch time = Stopwatch.StartNew();
-			
+
 			save.Regions.AsParallel().ForAll(region =>
 			{
 				foreach (ChunkData chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
@@ -47,7 +52,7 @@ namespace MCSharp.ConsoleApp
 			});
 
 			Console.WriteLine(time.Elapsed);
-			
+
 			Bitmap bitmap = new Bitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
@@ -117,14 +122,14 @@ namespace MCSharp.ConsoleApp
 										hillshade = 0;
 								}
 
-								hillshade = (int)hillshade;
+								hillshade = (int) hillshade;
 
 
 								Color color = GetColorForBiomeKind(biome);
-								Color overlay = Color.FromArgb(150, (int)hillshade, (int)hillshade, (int)hillshade);
+								Color overlay = Color.FromArgb(150, (int) hillshade, (int) hillshade, (int) hillshade);
 
 								if (hillshade == 180)
-									overlay = Color.FromArgb(100, (int)hillshade, (int)hillshade, (int)hillshade);
+									overlay = Color.FromArgb(100, (int) hillshade, (int) hillshade, (int) hillshade);
 
 								bitmapWriter.SetPixel(imageX, imageY, BlendWith(color, overlay));
 							}
