@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -18,6 +20,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 		{
 			m_availableSaves = GameSaveInfo.GetAvailableSaves().ToList().AsReadOnly();
 			SelectedSave = m_availableSaves.FirstOrDefault();
+			m_elapsed = TimeSpan.FromMilliseconds(0);
 		}
 
 		public ReadOnlyCollection<GameSaveInfo> AvailableSaves
@@ -55,6 +58,25 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 		}
 
+		public static readonly string ElapsedProperty = ExpressionUtility.GetPropertyName((MainWindowModel x) => x.Elapsed);
+		public TimeSpan Elapsed
+		{
+			get
+			{
+				VerifyAccess();
+				return m_elapsed;
+			}
+			set
+			{
+				VerifyAccess();
+				if (value != m_elapsed)
+				{
+					m_elapsed = value;
+					RaisePropertyChanged(ElapsedProperty);
+				}
+			}
+		}
+
 		private async void GenerateImage()
 		{
 			if (m_selectedSave == null)
@@ -64,83 +86,95 @@ namespace MCSharp.WorldBrowser.ViewModels
 			if (m_source != null)
 				m_source.Cancel();
 
+			Stopwatch stopwatch = Stopwatch.StartNew();
+			
 			m_source = new CancellationTokenSource();
 
 			GameSave save = GameSave.Load(m_selectedSave);
 
+			TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>> regionToBytesTransform = new TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>>(x =>
+			{
+				byte[] bytes = GetRegionBytes(x);
+				return Tuple.Create(save, x, bytes);
+			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, MaxDegreeOfParallelism = 4});
+			
+			ActionBlock<Tuple<GameSave, RegionFile, byte[]>> renderRegionAction = new ActionBlock<Tuple<GameSave, RegionFile, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
+				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
+
+			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
+
 			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
-			var tasks = save.Regions.Select(r => RenderRegionAsync(save, r, m_source.Token));
+			foreach (var region in save.Regions)
+				regionToBytesTransform.Post(region);
+			regionToBytesTransform.Complete();
 
 			try
 			{
-				await Task.WhenAll(tasks);
+				await renderRegionAction.Completion;
 			}
 			catch (OperationCanceledException)
 			{
 			}
 
 			// update status to say we're done
+			Elapsed = stopwatch.Elapsed;
 		}
 
-		private async Task RenderRegionAsync(GameSave save, RegionFile region, CancellationToken token)
+		private void RenderRegion(GameSave save, RegionFile region, byte[] bytes)
 		{
-			byte[] bytes = await GetRegionBytesAsync(region, token);
-			
-			int regionXOffset = region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
-			int regionZOffset = region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+			int regionXOffset = region.RegionX*Constants.RegionBlockWidth - save.Bounds.MinXBlock;
+			int regionZOffset = region.RegionZ*Constants.RegionBlockWidth - save.Bounds.MinZBlock;
 
-			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
-			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
+			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth,
+			                                     Constants.RegionBlockWidth);
+			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth*s_bytesPerPixel, 0);
 		}
 
-		private static Task<byte[]> GetRegionBytesAsync(RegionFile region, CancellationToken token)
+		private static byte[] GetRegionBytes(RegionFile region)
 		{
-			return Task.Run(() =>
+			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
+
+			Byte[] bytes = new Byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
+
+			foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 			{
-				IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
+				int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
+				int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
+				
+				// Stop if canceled in middle of chunk processing
+				//token.ThrowIfCancellationRequested();
 
-				Byte[] bytes = new Byte[Constants.RegionBlockWidth*Constants.RegionBlockWidth*s_bytesPerPixel];
-
-				foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
+				for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 				{
-					int xOffset = chunk.Info.ChunkX*Constants.ChunkBlockWidth;
-					int zOffset = chunk.Info.ChunkZ*Constants.ChunkBlockWidth;
-
-					// Stop if canceled in middle of chunk processing
-					token.ThrowIfCancellationRequested();
-
-					for (int z = 0; z < Constants.ChunkBlockWidth; z++)
-					{
-						int? lastHeight = null;
+					int? lastHeight = null;
 						
-						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
-						{
-							BiomeKind biome = chunk.GetBiome(x, z);
+					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+					{
+						BiomeKind biome = chunk.GetBiome(x, z);
 
-							int height = chunk.GetHeight(x, z);
+						int height = chunk.GetHeight(x, z);
 
-							Color color = GetColorForBiomeKind(biome);
+						Color color = GetColorForBiomeKind(biome);
 
-							if (lastHeight.HasValue && height > lastHeight)
-								color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
-							if (lastHeight.HasValue && height < lastHeight)
-								color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
+						if (lastHeight.HasValue && height > lastHeight)
+							color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+						if (lastHeight.HasValue && height < lastHeight)
+							color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-							int pixelStart = (x + xOffset + ((z + zOffset)*Constants.RegionBlockWidth))*s_bytesPerPixel;
-							bytes[pixelStart] = color.B;
-							bytes[pixelStart + 1] = color.G;
-							bytes[pixelStart + 2] = color.R;
-							bytes[pixelStart + 3] = color.A;
+						int pixelStart = (x + xOffset + ((z + zOffset)*Constants.RegionBlockWidth))*s_bytesPerPixel;
+						bytes[pixelStart] = color.B;
+						bytes[pixelStart + 1] = color.G;
+						bytes[pixelStart + 2] = color.R;
+						bytes[pixelStart + 3] = color.A;
 
-							lastHeight = height;
-						}
+						lastHeight = height;
 					}
 				}
+			}
 
-				return bytes;
-			}, token);
+			return bytes;
 		}
 
 		private static Color BlendWith(Color background, Color overlay)
@@ -211,5 +245,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 		GameSaveInfo m_selectedSave;
 		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
 		WriteableBitmap m_image;
+		TimeSpan m_elapsed;
 	}
 }

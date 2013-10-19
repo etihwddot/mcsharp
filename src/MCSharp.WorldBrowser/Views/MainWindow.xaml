@@ -37,6 +37,8 @@
 				Width="300"
 				SelectedItem="{Binding SelectedSave}"
 				ItemsSource="{Binding AvailableSaves}" />
+
+			<TextBlock Text="{Binding Elapsed}" />
 		</StackPanel>
 
 		<view:PanZoomControl Grid.Row="1">
