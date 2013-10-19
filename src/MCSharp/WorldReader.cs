@@ -36,12 +36,12 @@ namespace MCSharp
 		{
 			return Task.Run(() =>
 			{
-				using (var regionReader = GetRegionContainingBlock(chunkX, chunkZ))
+				using (var regionReader = GetRegionContainingChunk(chunkX, chunkZ))
 					return regionReader.ReadChunkData(chunkX, chunkZ);
 			});
 		}
 
-		private RegionReader GetRegionContainingBlock(int chunkX, int chunkZ)
+		private RegionReader GetRegionContainingChunk(int chunkX, int chunkZ)
 		{
 			int regionX = chunkX / Constants.RegionChunkWidth - (chunkX < 0 ? 1 : 0);
 			int regionZ = chunkZ / Constants.RegionChunkWidth - (chunkZ < 0 ? 1 : 0);
