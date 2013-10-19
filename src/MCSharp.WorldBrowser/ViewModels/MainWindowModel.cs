@@ -97,10 +97,10 @@ namespace MCSharp.WorldBrowser.ViewModels
 				byte[] data = new byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
 
 				var chunkLoaderTransform = new TransformBlock<RegionChunkLoader, RegionChunk>(x => x.ReadChunk(),
-					new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
+					new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, CancellationToken = m_source.Token });
 
 				var chunkToImageData = new ActionBlock<RegionChunk>(x => WriteChunkImageData(save, x, data),
-					new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2, CancellationToken = m_source.Token });
+					new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
 
 				chunkLoaderTransform.LinkTo(chunkToImageData, new DataflowLinkOptions { PropagateCompletion = true });
 
@@ -115,7 +115,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 				int imageY = r.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
 
 				return new RegionImageData(imageX, imageY, data);
-			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token });
+			}, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2, CancellationToken = m_source.Token });
 
 			var renderRegion = new ActionBlock<RegionImageData>(x => RenderRegion(x),
 				new ExecutionDataflowBlockOptions { TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext(), CancellationToken = m_source.Token });
