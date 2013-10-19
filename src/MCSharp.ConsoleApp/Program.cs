@@ -141,12 +141,12 @@ namespace MCSharp.ConsoleApp
 			return chunk;
 		}
 
-		private static async Task<double> GetBlockHeight(ChunkData chunk, int blockX, int blockZ, WorldReader reader, GameSaveBounds bounds, Dictionary<int, ChunkData> cache)
+		private static async Task<double> GetBlockHeight(ChunkData chunk, int blockZ, int blockX, WorldReader reader, GameSaveBounds bounds, Dictionary<int, ChunkData> cache)
 		{
 			// load correct chunk
 			if (blockZ < 0)
 			{
-				if (blockX > 0)
+				if (blockX < 0)
 					chunk = await GetChunk(reader, bounds, chunk.XPosition.Value - 1, chunk.ZPosition.Value - 1, cache);
 				else if (blockX >= Constants.ChunkBlockWidth)
 					chunk = await GetChunk(reader, bounds, chunk.XPosition.Value + 1, chunk.ZPosition.Value - 1, cache);
