@@ -90,7 +90,7 @@ namespace MCSharp.WorldBrowser.Views
 		{
 			// calculate initial bounds of content
 			// calculate the initial position of the mouse
-			Point mousePoint = e.GetPosition(this);
+			Point mousePoint = e.GetPosition(m_content);
 			Point initialPoint = m_scaleTransform.Transform(mousePoint);
 			
 			if (e.Delta > 0)
