@@ -9,20 +9,7 @@ namespace MCSharp
 {
 	public sealed class ChunkLoader
 	{
-		public static ChunkLoader Create(string regionsPath)
-		{
-			if (regionsPath == null)
-				throw new ArgumentNullException("regionsPath");
-
-			return new ChunkLoader(regionsPath);
-		}
-
-		private ChunkLoader(string regionsPath)
-		{
-			m_regionsPath = regionsPath;
-		}
-
-		public static IEnumerable<ChunkData> LoadChunksInRegion(RegionFile regionFile)
+		public static IEnumerable<ChunkLoader> LoadChunksInRegion(RegionFile regionFile)
 		{
 			using (Stream stream = File.OpenRead(regionFile.FileName))
 			using (BinaryReader reader = new BinaryReader(stream))
@@ -38,7 +25,7 @@ namespace MCSharp
 					// return empty chunks
 					if (!chunk.ChunkExists)
 					{
-						yield return ChunkData.Create(chunk, null);
+						yield return new ChunkLoader(chunk);
 						continue;
 					}
 
@@ -50,22 +37,44 @@ namespace MCSharp
 					NbtCompressionType compressionType = (NbtCompressionType) reader.ReadByte();
 					byte[] compressedData = reader.ReadBytes(compressedSize - 1);
 
-					NbtCompound root;
-					using (MemoryStream memoryStream = new MemoryStream(compressedData))
-					using (NbtReader nbtReader = new NbtReader(memoryStream, compressionType))
-					{
-						root = (NbtCompound) nbtReader.ReadTag();
-
-						// verify we read all of the compressed data
-						if (memoryStream.Position != memoryStream.Length)
-							throw new InvalidOperationException();
-					}
-
-					yield return ChunkData.Create(chunk, root);
+					yield return new ChunkLoader(chunk, compressionType, compressedData);
 				}
 			}
 		}
 
-		string m_regionsPath;
+		public ChunkData ReadData()
+		{
+			if (m_compressedChunkData == null)
+				return ChunkData.Create(m_chunkInfo, null);
+
+			NbtCompound root;
+			using (MemoryStream memoryStream = new MemoryStream(m_compressedChunkData))
+			using (NbtReader nbtReader = new NbtReader(memoryStream, m_compressionType))
+			{
+				root = (NbtCompound)nbtReader.ReadTag();
+
+				// verify we read all of the compressed data
+				if (memoryStream.Position != memoryStream.Length)
+					throw new InvalidOperationException();
+			}
+
+			return ChunkData.Create(m_chunkInfo, root);
+		}
+
+		private ChunkLoader(ChunkInfo info)
+			: this(info, default(NbtCompressionType), null)
+		{
+		}
+
+		private ChunkLoader(ChunkInfo info, NbtCompressionType compressionType, byte[] compressedChunkData)
+		{
+			m_chunkInfo = info;
+			m_compressionType = compressionType;
+			m_compressedChunkData = compressedChunkData;
+		}
+
+		readonly ChunkInfo m_chunkInfo;
+		readonly NbtCompressionType m_compressionType;
+		readonly byte[] m_compressedChunkData;
 	}
 }

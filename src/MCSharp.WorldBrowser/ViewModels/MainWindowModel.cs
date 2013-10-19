@@ -92,27 +92,33 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			GameSave save = GameSave.Load(m_selectedSave);
 
-			TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>> regionToBytesTransform = new TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>>(x =>
-			{
-				byte[] bytes = GetRegionBytes(x);
-				return Tuple.Create(save, x, bytes);
-			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, MaxDegreeOfParallelism = 4});
-			
-			ActionBlock<Tuple<GameSave, RegionFile, byte[]>> renderRegionAction = new ActionBlock<Tuple<GameSave, RegionFile, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
-				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
+			var regionsToChunkLoaders = new TransformManyBlock<RegionFile, RegionChunkLoader>(r => ChunkLoader.LoadChunksInRegion(r).Select(c => new RegionChunkLoader(r, c)),
+				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token });
 
-			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
+			var chunkLoaderTransform = new TransformBlock<RegionChunkLoader, RegionChunk>(x => x.ReadChunk(),
+				new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
+
+			var chunkToImageData = new TransformBlock<RegionChunk, ChunkImageData>(x => GetChunkImageData(save, x),
+				new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
+
+			var renderChunk = new ActionBlock<ChunkImageData>(x => RenderChunk(x),
+				new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext(), CancellationToken = m_source.Token });
+
+			regionsToChunkLoaders.LinkTo(chunkLoaderTransform, new DataflowLinkOptions { PropagateCompletion = true });
+			chunkLoaderTransform.LinkTo(chunkToImageData, new DataflowLinkOptions { PropagateCompletion = true });
+			chunkToImageData.LinkTo(renderChunk, new DataflowLinkOptions { PropagateCompletion = true });
 
 			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
 			foreach (var region in save.Regions)
-				regionToBytesTransform.Post(region);
-			regionToBytesTransform.Complete();
+				regionsToChunkLoaders.Post(region);
+			
+			regionsToChunkLoaders.Complete();
 
 			try
 			{
-				await renderRegionAction.Completion;
+				await renderChunk.Completion;
 			}
 			catch (OperationCanceledException)
 			{
@@ -122,59 +128,56 @@ namespace MCSharp.WorldBrowser.ViewModels
 			Elapsed = stopwatch.Elapsed;
 		}
 
-		private void RenderRegion(GameSave save, RegionFile region, byte[] bytes)
+		private void RenderChunk(ChunkImageData imageData)
 		{
-			int regionXOffset = region.RegionX*Constants.RegionBlockWidth - save.Bounds.MinXBlock;
-			int regionZOffset = region.RegionZ*Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+			if (imageData == null)
+				return;
 
-			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth,
-			                                     Constants.RegionBlockWidth);
-			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth*s_bytesPerPixel, 0);
+			Int32Rect regionRect = new Int32Rect(imageData.XOffset, imageData.ZOffset, Constants.ChunkBlockWidth, Constants.ChunkBlockWidth);
+			m_image.WritePixels(regionRect, imageData.ImageData, Constants.ChunkBlockWidth * s_bytesPerPixel, 0);
 		}
 
-		private static byte[] GetRegionBytes(RegionFile region)
+		private static ChunkImageData GetChunkImageData(GameSave save, RegionChunk regionChunk)
 		{
-			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
+			var chunk = regionChunk.Chunk;
+			if (chunk.IsEmpty)
+				return null;
 
-			Byte[] bytes = new Byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
-
-			foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
+			byte[] bytes = new byte[Constants.ChunkBlockWidth * Constants.ChunkBlockWidth * s_bytesPerPixel];
+			for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 			{
-				int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
-				int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
-				
-				// Stop if canceled in middle of chunk processing
-				//token.ThrowIfCancellationRequested();
+				int? lastHeight = null;
 
-				for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+				for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 				{
-					int? lastHeight = null;
-						
-					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
-					{
-						BiomeKind biome = chunk.GetBiome(x, z);
+					BiomeKind biome = chunk.GetBiome(x, z);
 
-						int height = chunk.GetHeight(x, z);
+					int height = chunk.GetHeight(x, z);
 
-						Color color = GetColorForBiomeKind(biome);
+					Color color = GetColorForBiomeKind(biome);
 
-						if (lastHeight.HasValue && height > lastHeight)
-							color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
-						if (lastHeight.HasValue && height < lastHeight)
-							color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
+					if (lastHeight.HasValue && height > lastHeight)
+						color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+					if (lastHeight.HasValue && height < lastHeight)
+						color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-						int pixelStart = (x + xOffset + ((z + zOffset)*Constants.RegionBlockWidth))*s_bytesPerPixel;
-						bytes[pixelStart] = color.B;
-						bytes[pixelStart + 1] = color.G;
-						bytes[pixelStart + 2] = color.R;
-						bytes[pixelStart + 3] = color.A;
+					int pixelStart = (x + (z * Constants.ChunkBlockWidth)) * s_bytesPerPixel;
+					bytes[pixelStart] = color.B;
+					bytes[pixelStart + 1] = color.G;
+					bytes[pixelStart + 2] = color.R;
+					bytes[pixelStart + 3] = color.A;
 
-						lastHeight = height;
-					}
+					lastHeight = height;
 				}
 			}
 
-			return bytes;
+			int regionXOffset = regionChunk.Region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
+			int regionZOffset = regionChunk.Region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+
+			int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
+			int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
+
+			return new ChunkImageData(regionXOffset + xOffset, regionZOffset + zOffset, bytes);
 		}
 
 		private static Color BlendWith(Color background, Color overlay)
@@ -233,6 +236,74 @@ namespace MCSharp.WorldBrowser.ViewModels
 				return value < 98 ? Colors.ForestGreen : value < 99 ? Colors.Tan : Colors.Red;
 			default: return Colors.Red;
 			}
+		}
+
+		sealed class ChunkImageData
+		{
+			public ChunkImageData(int xOffset, int zOffset, byte[] imageData)
+			{
+				m_xOffset = xOffset;
+				m_zOffset = zOffset;
+				m_imageData = imageData;
+			}
+
+			public int XOffset
+			{
+				get { return m_xOffset; }
+			}
+
+			public int ZOffset
+			{
+				get { return m_zOffset; }
+			}
+
+			public byte[] ImageData
+			{
+				get { return m_imageData; }
+			}
+
+			int m_xOffset;
+			int m_zOffset;
+			byte[] m_imageData;
+		}
+
+		sealed class RegionChunk
+		{
+			public RegionChunk(RegionFile region, ChunkData chunk)
+			{
+				m_region = region;
+				m_chunk = chunk;
+			}
+
+			public RegionFile Region
+			{
+				get { return m_region; }
+			}
+
+			public ChunkData Chunk
+			{
+				get { return m_chunk; }
+			}
+
+			readonly RegionFile m_region;
+			readonly ChunkData m_chunk;
+		}
+
+		sealed class RegionChunkLoader
+		{
+			public RegionChunkLoader(RegionFile region, ChunkLoader loader)
+			{
+				m_region = region;
+				m_chunkLoader = loader;
+			}
+
+			public RegionChunk ReadChunk()
+			{
+				return new RegionChunk(m_region, m_chunkLoader.ReadData());
+			}
+
+			readonly RegionFile m_region;
+			readonly ChunkLoader m_chunkLoader;
 		}
 
 		static readonly Random s_random = new Random();
