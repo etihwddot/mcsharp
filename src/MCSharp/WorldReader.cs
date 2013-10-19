@@ -37,19 +37,14 @@ namespace MCSharp
 			return Task.Run(() =>
 			{
 				using (var regionReader = GetRegionContainingBlock(chunkX, chunkZ))
-				{
-					int regionRelativeChunkX = Math.Abs(chunkX % Constants.RegionChunkWidth);
-					int regionRelativeChunkZ = Math.Abs(chunkZ % Constants.RegionChunkWidth);
-
-					return regionReader.ReadChunkData(regionRelativeChunkX, regionRelativeChunkZ);
-				}
+					return regionReader.ReadChunkData(chunkX, chunkZ);
 			});
 		}
 
 		private RegionReader GetRegionContainingBlock(int chunkX, int chunkZ)
 		{
-			int regionX = chunkX / Constants.RegionChunkWidth;
-			int regionZ = chunkZ / Constants.RegionChunkWidth;
+			int regionX = chunkX / Constants.RegionChunkWidth - (chunkX < 0 ? 1 : 0);
+			int regionZ = chunkZ / Constants.RegionChunkWidth - (chunkZ < 0 ? 1 : 0);
 
 			return new RegionReader(m_saveFolder, regionX, regionZ);
 		}
@@ -59,6 +54,9 @@ namespace MCSharp
 		{
 			public RegionReader(string saveFolder, int regionX, int regionZ)
 			{
+				m_regionX = regionX;
+				m_regionZ = regionZ;
+				
 				string regionFile = Path.Combine(saveFolder, c_regionFolderName, c_regionFileNameFormat.FormatInvariant(regionX, regionZ));
 				if (File.Exists(regionFile))
 				{
@@ -67,8 +65,11 @@ namespace MCSharp
 				}
 			}
 
-			public ChunkData ReadChunkData(int regionRelativeChunkX, int regionRelativeChunkZ)
+			public ChunkData ReadChunkData(int chunkX, int chunkZ)
 			{
+				var regionRelativeChunkX = chunkX - m_regionX * Constants.RegionChunkWidth;
+				var regionRelativeChunkZ = chunkZ - m_regionZ * Constants.RegionChunkWidth;
+
 				if (m_reader == null)
 					return ChunkData.Create(new ChunkInfo(regionRelativeChunkZ * Constants.RegionChunkWidth + regionRelativeChunkX, 0, 0), null);
 
@@ -112,6 +113,9 @@ namespace MCSharp
 				for (int chunkIndex = 0; chunkIndex < Constants.ChunksPerRegion; chunkIndex++)
 					m_chunkDataLocations[chunkIndex] = new ChunkInfo(chunkIndex, m_reader.ReadBigEndianInt32(3), m_reader.ReadByte());
 			}
+
+			int m_regionX;
+			int m_regionZ;
 
 			BinaryReader m_reader;
 			ChunkInfo[] m_chunkDataLocations;
