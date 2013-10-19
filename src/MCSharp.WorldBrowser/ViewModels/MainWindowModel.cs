@@ -92,33 +92,47 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			GameSave save = GameSave.Load(m_selectedSave);
 
-			var regionsToChunkLoaders = new TransformManyBlock<RegionFile, RegionChunkLoader>(r => ChunkLoader.LoadChunksInRegion(r).Select(c => new RegionChunkLoader(r, c)),
-				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token });
+			var regionProcessor = new TransformBlock<RegionFile, RegionImageData>(async r =>
+			{
+				byte[] data = new byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
 
-			var chunkLoaderTransform = new TransformBlock<RegionChunkLoader, RegionChunk>(x => x.ReadChunk(),
-				new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
+				var chunkLoaderTransform = new TransformBlock<RegionChunkLoader, RegionChunk>(x => x.ReadChunk(),
+					new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
 
-			var chunkToImageData = new TransformBlock<RegionChunk, ChunkImageData>(x => GetChunkImageData(save, x),
-				new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 4, CancellationToken = m_source.Token });
+				var chunkToImageData = new ActionBlock<RegionChunk>(x => WriteChunkImageData(save, x, data),
+					new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2, CancellationToken = m_source.Token });
 
-			var renderChunk = new ActionBlock<ChunkImageData>(x => RenderChunk(x),
-				new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext(), CancellationToken = m_source.Token });
+				chunkLoaderTransform.LinkTo(chunkToImageData, new DataflowLinkOptions { PropagateCompletion = true });
 
-			regionsToChunkLoaders.LinkTo(chunkLoaderTransform, new DataflowLinkOptions { PropagateCompletion = true });
-			chunkLoaderTransform.LinkTo(chunkToImageData, new DataflowLinkOptions { PropagateCompletion = true });
-			chunkToImageData.LinkTo(renderChunk, new DataflowLinkOptions { PropagateCompletion = true });
+				foreach (var chunk in ChunkLoader.LoadChunksInRegion(r))
+					chunkLoaderTransform.Post(new RegionChunkLoader(r, chunk));
+
+				chunkLoaderTransform.Complete();
+
+				await chunkToImageData.Completion;
+
+				int imageX = r.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
+				int imageY = r.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+
+				return new RegionImageData(imageX, imageY, data);
+			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token });
+
+			var renderRegion = new ActionBlock<RegionImageData>(x => RenderRegion(x),
+				new ExecutionDataflowBlockOptions { TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext(), CancellationToken = m_source.Token });
+
+			regionProcessor.LinkTo(renderRegion, new DataflowLinkOptions { PropagateCompletion = true });
 
 			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
 			foreach (var region in save.Regions)
-				regionsToChunkLoaders.Post(region);
-			
-			regionsToChunkLoaders.Complete();
+				regionProcessor.Post(region);
+
+			regionProcessor.Complete();
 
 			try
 			{
-				await renderChunk.Completion;
+				await renderRegion.Completion;
 			}
 			catch (OperationCanceledException)
 			{
@@ -128,22 +142,24 @@ namespace MCSharp.WorldBrowser.ViewModels
 			Elapsed = stopwatch.Elapsed;
 		}
 
-		private void RenderChunk(ChunkImageData imageData)
+		private void RenderRegion(RegionImageData imageData)
 		{
 			if (imageData == null)
 				return;
 
-			Int32Rect regionRect = new Int32Rect(imageData.XOffset, imageData.ZOffset, Constants.ChunkBlockWidth, Constants.ChunkBlockWidth);
-			m_image.WritePixels(regionRect, imageData.ImageData, Constants.ChunkBlockWidth * s_bytesPerPixel, 0);
+			Int32Rect regionRect = new Int32Rect(imageData.XOffset, imageData.ZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
+			m_image.WritePixels(regionRect, imageData.ImageData, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
 		}
 
-		private static ChunkImageData GetChunkImageData(GameSave save, RegionChunk regionChunk)
+		private static void WriteChunkImageData(GameSave save, RegionChunk regionChunk, byte[] data)
 		{
 			var chunk = regionChunk.Chunk;
 			if (chunk.IsEmpty)
-				return null;
+				return;
 
-			byte[] bytes = new byte[Constants.ChunkBlockWidth * Constants.ChunkBlockWidth * s_bytesPerPixel];
+			int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
+			int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
+
 			for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 			{
 				int? lastHeight = null;
@@ -161,23 +177,15 @@ namespace MCSharp.WorldBrowser.ViewModels
 					if (lastHeight.HasValue && height < lastHeight)
 						color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-					int pixelStart = (x + (z * Constants.ChunkBlockWidth)) * s_bytesPerPixel;
-					bytes[pixelStart] = color.B;
-					bytes[pixelStart + 1] = color.G;
-					bytes[pixelStart + 2] = color.R;
-					bytes[pixelStart + 3] = color.A;
+					int pixelStart = ((x + xOffset) + ((z + zOffset) * Constants.RegionBlockWidth)) * s_bytesPerPixel;
+					data[pixelStart] = color.B;
+					data[pixelStart + 1] = color.G;
+					data[pixelStart + 2] = color.R;
+					data[pixelStart + 3] = color.A;
 
 					lastHeight = height;
 				}
 			}
-
-			int regionXOffset = regionChunk.Region.RegionX * Constants.RegionBlockWidth - save.Bounds.MinXBlock;
-			int regionZOffset = regionChunk.Region.RegionZ * Constants.RegionBlockWidth - save.Bounds.MinZBlock;
-
-			int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
-			int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
-
-			return new ChunkImageData(regionXOffset + xOffset, regionZOffset + zOffset, bytes);
 		}
 
 		private static Color BlendWith(Color background, Color overlay)
@@ -238,9 +246,9 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 		}
 
-		sealed class ChunkImageData
+		sealed class RegionImageData
 		{
-			public ChunkImageData(int xOffset, int zOffset, byte[] imageData)
+			public RegionImageData(int xOffset, int zOffset, byte[] imageData)
 			{
 				m_xOffset = xOffset;
 				m_zOffset = zOffset;
