@@ -73,10 +73,16 @@ namespace MCSharp
 				if (m_reader == null)
 					return ChunkData.Create(new ChunkInfo(regionRelativeChunkZ * Constants.RegionChunkWidth + regionRelativeChunkX, 0, 0), null);
 
-				if (m_chunkDataLocations == null)
-					ReadHeader();
+				// calculate position of chunk in header
+				int position = regionRelativeChunkZ * Constants.RegionChunkWidth + regionRelativeChunkX;
 
-				var chunkInfo = m_chunkDataLocations[regionRelativeChunkZ * Constants.RegionChunkWidth + regionRelativeChunkX];
+				// seek to position of chunk in header
+				m_reader.BaseStream.Seek(position * 4, SeekOrigin.Begin);
+
+				// read chunk info details
+				int offset = m_reader.ReadBigEndianInt32(3);
+				int size = m_reader.ReadByte();
+				ChunkInfo chunkInfo = new ChunkInfo(position, offset, size);
 				if (!chunkInfo.ChunkExists)
 					return ChunkData.Create(chunkInfo, null);
 
@@ -105,13 +111,6 @@ namespace MCSharp
 			{
 				if (m_reader != null)
 					m_reader.Dispose();
-			}
-
-			private void ReadHeader()
-			{
-				m_chunkDataLocations = new ChunkInfo[Constants.ChunksPerRegion * Constants.ChunksPerRegion];
-				for (int chunkIndex = 0; chunkIndex < Constants.ChunksPerRegion; chunkIndex++)
-					m_chunkDataLocations[chunkIndex] = new ChunkInfo(chunkIndex, m_reader.ReadBigEndianInt32(3), m_reader.ReadByte());
 			}
 
 			int m_regionX;
