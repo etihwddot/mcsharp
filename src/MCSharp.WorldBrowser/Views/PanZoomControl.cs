@@ -103,7 +103,7 @@ namespace MCSharp.WorldBrowser.Views
 					m_zoomLevel--;
 			}
 
-			double scaleValue = Math.Pow((m_zoomLevel + 1) / 2.0, c_scaleIncrement);
+			double scaleValue = Math.Pow(m_zoomLevel, (m_zoomLevel + 7) / 8.0);
 			m_scaleTransform.ScaleX = scaleValue;
 			m_scaleTransform.ScaleY = scaleValue;
 
