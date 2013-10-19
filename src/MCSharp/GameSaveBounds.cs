@@ -1,7 +1,13 @@
-﻿namespace MCSharp
+﻿using System;
+namespace MCSharp
 {
 	public class GameSaveBounds
 	{
+		public static GameSaveBounds CreateDefault()
+		{
+			return new GameSaveBounds(int.MaxValue, int.MinValue, int.MinValue, int.MaxValue);
+		}
+
 		public GameSaveBounds(int minZ, int maxX, int maxZ, int minX)
 		{
 			m_minZ = minZ;
@@ -68,6 +74,15 @@
 		public int BlockHeight
 		{
 			get { return RegionHeight * Constants.RegionBlockWidth; }
+		}
+
+		public GameSaveBounds Union(int regionX, int regionZ)
+		{
+			return new GameSaveBounds(
+				Math.Min(MinZ, regionZ),
+				Math.Max(MaxX, regionX),
+				Math.Max(MaxZ, regionZ),
+				Math.Min(MinX, regionX));
 		}
 
 		int m_minZ;

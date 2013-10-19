@@ -16,8 +16,8 @@ namespace MCSharp.ConsoleApp
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 
-			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
-			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
+			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
+			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
 			{
 				Console.WriteLine("Unable to load save.");
@@ -31,6 +31,8 @@ namespace MCSharp.ConsoleApp
 
 			int[,] heightMap = new int[save.Bounds.BlockHeight, save.Bounds.BlockWidth];
 
+			Stopwatch time = Stopwatch.StartNew();
+			
 			save.Regions.AsParallel().ForAll(region =>
 			{
 				foreach (ChunkData chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
@@ -43,6 +45,8 @@ namespace MCSharp.ConsoleApp
 							heightMap[z + zOffset, x + xOffset] = chunk.GetHeight(x, z);
 				}
 			});
+
+			Console.WriteLine(time.Elapsed);
 			
 			Bitmap bitmap = new Bitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))

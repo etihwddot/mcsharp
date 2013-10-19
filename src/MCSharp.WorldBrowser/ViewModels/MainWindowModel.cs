@@ -89,6 +89,11 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			m_source = new CancellationTokenSource();
 
+			WorldReader newSave = new WorldReader(m_selectedSave.Location);
+
+
+
+
 			GameSave save = GameSave.Load(m_selectedSave);
 
 			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);

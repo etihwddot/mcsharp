@@ -67,6 +67,7 @@
     <Compile Include="NamedBinaryTag\NbtShort.cs" />
     <Compile Include="NamedBinaryTag\NbtString.cs" />
     <Compile Include="NamedBinaryTag\NbtValueBase.cs" />
+    <Compile Include="NewGameSave.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionFile.cs" />
     <Compile Include="GameSaveBounds.cs" />
