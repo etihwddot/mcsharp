@@ -45,7 +45,7 @@ namespace MCSharp.ConsoleApp
 				{
 					for (int xChunk = bounds.MinXChunk; xChunk <= bounds.MaxXChunk; xChunk++)
 					{
-						ChunkData chunk = await reader.GetChunkForChunkCoordinate(xChunk, zChunk);
+						ChunkData chunk = await reader.GetChunkForChunkCoordinateAsync(xChunk, zChunk);
 						if (chunk == null || chunk.IsEmpty)
 							continue;
 
