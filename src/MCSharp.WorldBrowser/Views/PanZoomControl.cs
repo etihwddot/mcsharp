@@ -95,14 +95,17 @@ namespace MCSharp.WorldBrowser.Views
 			
 			if (e.Delta > 0)
 			{
-				m_scaleTransform.ScaleX += c_scaleIncrement;
-				m_scaleTransform.ScaleY += c_scaleIncrement;
+				m_zoomLevel++;
 			}
 			else
 			{
-				m_scaleTransform.ScaleX = Math.Max(1, m_scaleTransform.ScaleX - c_scaleIncrement);
-				m_scaleTransform.ScaleY = Math.Max(1, m_scaleTransform.ScaleY - c_scaleIncrement);
+				if (m_zoomLevel > 1)
+					m_zoomLevel--;
 			}
+
+			double scaleValue = Math.Pow((m_zoomLevel + 1) / 2.0, c_scaleIncrement);
+			m_scaleTransform.ScaleX = scaleValue;
+			m_scaleTransform.ScaleY = scaleValue;
 
 			// calculate the new location of the mouse
 			Point finalMousePoint = m_scaleTransform.Transform(mousePoint);
@@ -177,7 +180,9 @@ namespace MCSharp.WorldBrowser.Views
 			return value;
 		}
 
-		const double c_scaleIncrement = 0.5;
+		const double c_scaleIncrement = 2;
+
+		int m_zoomLevel;
 
 		FrameworkElement m_content;
 		ScaleTransform m_scaleTransform;
