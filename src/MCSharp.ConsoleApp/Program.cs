@@ -15,8 +15,8 @@ namespace MCSharp.ConsoleApp
 		{
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
-			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
-			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
+			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
+			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
 			{
 				Console.WriteLine("Unable to load save.");
@@ -68,15 +68,15 @@ namespace MCSharp.ConsoleApp
 								double hillshade = 0;
 								if (imageX > 0 && imageX < bounds.BlockWidth - 1 && imageY > 0 && imageY < bounds.BlockHeight - 1)
 								{
-									double a = chunk.GetHeight(z - 1, x - 1);
-									double b = chunk.GetHeight(z - 1, x);
-									double c = chunk.GetHeight(z - 1, x + 1);
-									double d = chunk.GetHeight(z, x - 1);
-									double e = chunk.GetHeight(z, x);
-									double f = chunk.GetHeight(z, x + 1);
-									double g = chunk.GetHeight(z + 1, x - 1);
-									double h = chunk.GetHeight(z + 1, x);
-									double i = chunk.GetHeight(z + 1, x + 1);
+									double a = await GetBlockHeight(chunk, z - 1, x - 1, reader);
+									double b = await GetBlockHeight(chunk, z - 1, x, reader);
+									double c = await GetBlockHeight(chunk, z - 1, x + 1, reader);
+									double d = await GetBlockHeight(chunk, z, x - 1, reader);
+									double e = await GetBlockHeight(chunk, z, x, reader);
+									double f = await GetBlockHeight(chunk, z, x + 1, reader);
+									double g = await GetBlockHeight(chunk, z + 1, x - 1, reader);
+									double h = await GetBlockHeight(chunk, z + 1, x, reader);
+									double i = await GetBlockHeight(chunk, z + 1, x + 1, reader);
 
 									// compute hillshade
 									const int cellsize = 4; // no idea what this is...
@@ -123,7 +123,53 @@ namespace MCSharp.ConsoleApp
 				}
 			}
 
+			bitmap.Save(outputLocation, ImageFormat.Png);
+
 			Console.WriteLine("Total time: {0}", stopwatch.ElapsedMilliseconds);
+		}
+
+		private static async Task<double> GetBlockHeight(ChunkData chunk, int blockX, int blockZ, WorldReader reader)
+		{
+			// load correct chunk
+			if (blockZ < 0)
+			{
+				if (blockX > 0)
+					chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value - 1, chunk.ZPosition.Value - 1);
+				else if (blockX >= Constants.ChunkBlockWidth)
+					chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value + 1, chunk.ZPosition.Value - 1);
+				else
+					chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value, chunk.ZPosition.Value - 1);
+			}
+			else if (blockZ >= Constants.ChunkBlockWidth)
+			{
+				if (blockX < 0)
+					chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value - 1, chunk.ZPosition.Value + 1);
+				else if (blockX >= Constants.ChunkBlockWidth)
+					chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value + 1, chunk.ZPosition.Value + 1);
+				else
+					chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value, chunk.ZPosition.Value + 1);
+			}
+			else if (blockX < 0)
+			{
+				chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value - 1, chunk.ZPosition.Value);
+			}
+			else if (blockX >= Constants.ChunkBlockWidth)
+			{
+				chunk = await reader.GetChunkForChunkCoordinateAsync(chunk.XPosition.Value + 1, chunk.ZPosition.Value);
+			}
+
+			// adjust block
+			if (blockX < 0)
+				blockX = Constants.ChunkBlockWidth - 1;
+			else if (blockX >= Constants.ChunkBlockWidth)
+				blockX = 0;
+
+			if (blockZ < 0)
+				blockZ = Constants.ChunkBlockWidth - 1;
+			else if (blockZ >= Constants.ChunkBlockWidth)
+				blockZ = 0;
+
+			return chunk.GetHeight(blockX, blockZ);
 		}
 
 		private static void CreateHillshadeBitmap(string outputLocation, GameSaveInfo saveInfo)
