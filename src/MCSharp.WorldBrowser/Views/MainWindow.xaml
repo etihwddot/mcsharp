@@ -37,7 +37,9 @@
 				Width="300"
 				SelectedItem="{Binding SelectedSave}"
 				ItemsSource="{Binding AvailableSaves}" />
-		</StackPanel>
+
+            <TextBlock Text="{Binding Elapsed}" />
+        </StackPanel>
 
 		<view:PanZoomControl Grid.Row="1">
 			<Image Source="{Binding Image}" />

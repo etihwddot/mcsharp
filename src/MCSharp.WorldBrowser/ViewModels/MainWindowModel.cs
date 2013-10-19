@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 		{
 			m_availableSaves = GameSaveInfo.GetAvailableSaves().ToList().AsReadOnly();
 			SelectedSave = m_availableSaves.FirstOrDefault();
+			m_elapsed = TimeSpan.FromMilliseconds(0);
 		}
 
 		public ReadOnlyCollection<GameSaveInfo> AvailableSaves
@@ -55,6 +57,25 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 		}
 
+		public static readonly string ElapsedProperty = ExpressionUtility.GetPropertyName((MainWindowModel x) => x.Elapsed);
+		public TimeSpan Elapsed
+		{
+			get
+			{
+				VerifyAccess();
+				return m_elapsed;
+			}
+			set
+			{
+				VerifyAccess();
+				if (value != m_elapsed)
+				{
+					m_elapsed = value;
+					RaisePropertyChanged(ElapsedProperty);
+				}
+			}
+		}
+
 		private async void GenerateImage()
 		{
 			if (m_selectedSave == null)
@@ -63,6 +84,8 @@ namespace MCSharp.WorldBrowser.ViewModels
 			// cancel existing work
 			if (m_source != null)
 				m_source.Cancel();
+
+			Stopwatch stopwatch = Stopwatch.StartNew();
 
 			m_source = new CancellationTokenSource();
 
@@ -82,6 +105,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 
 			// update status to say we're done
+			Elapsed = stopwatch.Elapsed;
 		}
 
 		private async Task RenderRegionAsync(GameSave save, RegionFile region, CancellationToken token)
@@ -211,5 +235,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 		GameSaveInfo m_selectedSave;
 		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
 		WriteableBitmap m_image;
+		TimeSpan m_elapsed;
 	}
 }
