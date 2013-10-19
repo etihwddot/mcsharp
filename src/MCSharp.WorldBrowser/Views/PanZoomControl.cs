@@ -106,11 +106,11 @@ namespace MCSharp.WorldBrowser.Views
 			Rect finalBounds = m_scaleTransform.TransformBounds(contentBounds);
 			double widthChange = initialBounds.Width - finalBounds.Width;
 			double offsetWidthChange = widthChange / 2;
-			TranslateX(m_translateTransform.X + offsetWidthChange, finalBounds);
+			CoerceTranslateX(m_translateTransform.X + offsetWidthChange);
 
 			double heightChange = initialBounds.Height - finalBounds.Height;
 			double offsetHeightChange = heightChange / 2;
-			TranslateY(m_translateTransform.Y + offsetHeightChange, finalBounds);
+			CoerceTranslateY(m_translateTransform.Y + offsetHeightChange);
 		}
 
 		protected override void OnMouseEnter(MouseEventArgs e)
@@ -142,33 +142,34 @@ namespace MCSharp.WorldBrowser.Views
 			if (Mouse.Captured == this && m_content != null)
 			{
 				Vector vector = e.GetPosition(this) - m_captureStart;
-				
-				// calculate the bounds of the content
-				Rect contentBounds = m_scaleTransform.TransformBounds(VisualTreeHelper.GetContentBounds(m_content));
-				
-				TranslateX(m_transformXStart + vector.X, contentBounds);
-				TranslateY(m_transformYStart + vector.Y, contentBounds);
+								
+				CoerceTranslateX(m_transformXStart + vector.X);
+				CoerceTranslateY(m_transformYStart + vector.Y);
 			}
 		}
 
-		private void TranslateX(double newX, Rect contentBounds)
+		private void CoerceTranslateX(double newX)
 		{
-			double widthDifference = Math.Max(0, contentBounds.Width - ActualWidth);
-			m_translateTransform.X = LimitValue(newX, widthDifference);
+			Rect contentBounds = m_scaleTransform.TransformBounds(VisualTreeHelper.GetContentBounds(m_content));
+
+			double widthDifference = Math.Min(0, m_content.ActualWidth - contentBounds.Width);
+			m_translateTransform.X = LimitValue(newX, widthDifference, 0);
 		}
 
-		private void TranslateY(double newY, Rect contentBounds)
+		private void CoerceTranslateY(double newY)
 		{
-			double heightDifference = Math.Max(0, contentBounds.Height - ActualHeight);
-			m_translateTransform.Y = LimitValue(newY, heightDifference);
+			Rect contentBounds = m_scaleTransform.TransformBounds(VisualTreeHelper.GetContentBounds(m_content));
+
+			double heightDifference = Math.Min(0, m_content.ActualHeight - contentBounds.Height);
+			m_translateTransform.Y = LimitValue(newY, heightDifference, 0);
 		}
 
-		private double LimitValue(double value, double absMaxValue)
+		private double LimitValue(double value, double minValue, double maxValue)
 		{
-			if (value > absMaxValue)
-				value = absMaxValue;
-			else if (value < -absMaxValue)
-				value = -absMaxValue;
+			if (value > maxValue)
+				value = maxValue;
+			else if (value < minValue)
+				value = minValue;
 
 			return value;
 		}
