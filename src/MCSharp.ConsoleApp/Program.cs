@@ -40,7 +40,7 @@ namespace MCSharp.ConsoleApp
 			{
 				// cache height for each block
 				Dictionary<int, ChunkData> chunkCache = new Dictionary<int, ChunkData>();
-
+				
 				for (int zChunk = bounds.MinZChunk; zChunk <= bounds.MaxZChunk; zChunk++)
 				{
 					for (int xChunk = bounds.MinXChunk; xChunk <= bounds.MaxXChunk; xChunk++)

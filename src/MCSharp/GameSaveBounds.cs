@@ -38,12 +38,12 @@ namespace MCSharp
 
 		public int MaxXChunk
 		{
-			get { return m_maxX * Constants.RegionChunkWidth; }
+			get { return m_minX+ ChunkWidth; }
 		}
 
 		public int MaxXBlock
 		{
-			get { return m_maxX * Constants.RegionBlockWidth; }
+			get { return m_minX * BlockWidth; }
 		}
 
 		public int MaxZ
@@ -53,12 +53,12 @@ namespace MCSharp
 
 		public int MaxZChunk
 		{
-			get { return m_maxZ * Constants.RegionChunkWidth; }
+			get { return m_minZ + ChunkHeight; }
 		}
 
 		public int MaxZBlock
 		{
-			get { return m_maxZ * Constants.RegionBlockWidth; }
+			get { return m_maxZ + BlockHeight; }
 		}
 
 		public int MinX
