@@ -42,7 +42,7 @@
 		</StackPanel>
 
 		<view:PanZoomControl Grid.Row="1">
-			<Image Source="{Binding Image}" />
+			<Image Source="{Binding Image}" Stretch="Uniform" />
 		</view:PanZoomControl>
 	</Grid>
 </Window>

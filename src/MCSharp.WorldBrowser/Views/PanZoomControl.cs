@@ -69,7 +69,7 @@ namespace MCSharp.WorldBrowser.Views
 				return new Size(0, 0);
 
 			m_content.Measure(availableSize);
-			return m_content.DesiredSize;
+			return availableSize;
 		}
 
 		protected override Size ArrangeOverride(Size finalSize)
@@ -78,7 +78,7 @@ namespace MCSharp.WorldBrowser.Views
 				return new Size(0, 0);
 
 			m_content.Arrange(new Rect(finalSize));
-			return m_content.RenderSize;
+			return finalSize;
 		}
 
 		protected override void OnRender(DrawingContext drawingContext)
