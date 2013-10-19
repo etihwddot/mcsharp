@@ -21,6 +21,11 @@ namespace MCSharp
 			get { return m_minZ; }
 		}
 
+		public int MinZChunk
+		{
+			get { return m_minZ * Constants.RegionChunkWidth; }
+		}
+
 		public int MinZBlock
 		{
 			get { return m_minZ * Constants.RegionBlockWidth; }
@@ -29,6 +34,11 @@ namespace MCSharp
 		public int MaxX
 		{
 			get { return m_maxX; }
+		}
+
+		public int MaxXChunk
+		{
+			get { return m_maxX * Constants.RegionChunkWidth; }
 		}
 
 		public int MaxXBlock
@@ -41,6 +51,11 @@ namespace MCSharp
 			get { return m_maxZ; }
 		}
 
+		public int MaxZChunk
+		{
+			get { return m_maxZ * Constants.RegionChunkWidth; }
+		}
+
 		public int MaxZBlock
 		{
 			get { return m_maxZ * Constants.RegionBlockWidth; }
@@ -49,6 +64,11 @@ namespace MCSharp
 		public int MinX
 		{
 			get { return m_minX; }
+		}
+
+		public int MinXChunk
+		{
+			get { return m_minX * Constants.RegionChunkWidth; }
 		}
 
 		public int MinXBlock
@@ -61,6 +81,11 @@ namespace MCSharp
 			get { return m_maxX - m_minX + 1; }
 		}
 
+		public int ChunkWidth
+		{
+			get { return RegionWidth * Constants.RegionChunkWidth; }
+		}
+
 		public int BlockWidth
 		{
 			get { return RegionWidth * Constants.RegionBlockWidth; }
@@ -69,6 +94,11 @@ namespace MCSharp
 		public int RegionHeight
 		{
 			get { return m_maxZ - m_minZ + 1; }
+		}
+
+		public int ChunkHeight
+		{
+			get { return RegionHeight * Constants.RegionChunkWidth; }
 		}
 
 		public int BlockHeight
