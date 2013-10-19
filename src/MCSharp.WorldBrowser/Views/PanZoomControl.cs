@@ -105,9 +105,12 @@ namespace MCSharp.WorldBrowser.Views
 
 			Rect finalBounds = m_scaleTransform.TransformBounds(contentBounds);
 			double widthChange = initialBounds.Width - finalBounds.Width;
-			double offsetChange = widthChange / 2;
-			TranslateX(m_translateTransform.X + offsetChange, finalBounds);
-			TranslateY(m_translateTransform.Y + offsetChange, finalBounds);
+			double offsetWidthChange = widthChange / 2;
+			TranslateX(m_translateTransform.X + offsetWidthChange, finalBounds);
+
+			double heightChange = initialBounds.Height - finalBounds.Height;
+			double offsetHeightChange = heightChange / 2;
+			TranslateY(m_translateTransform.Y + offsetHeightChange, finalBounds);
 		}
 
 		protected override void OnMouseEnter(MouseEventArgs e)
