@@ -14,9 +14,10 @@ namespace MCSharp.WorldBrowser.Views
 		{
 			m_scaleTransform = new ScaleTransform();
 			m_translateTransform = new TranslateTransform();
+			ClipToBounds = true;
 		}
 
-		public UIElement Content
+		public FrameworkElement Content
 		{
 			get
 			{
@@ -127,18 +128,37 @@ namespace MCSharp.WorldBrowser.Views
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			if (Mouse.Captured == this)
+			if (Mouse.Captured == this && m_content != null)
 			{
 				Vector vector = e.GetPosition(this) - m_captureStart;
+				
+				// calculate the bounds of the content currently
+				Rect contentBounds = m_scaleTransform.TransformBounds(VisualTreeHelper.GetContentBounds(m_content));
 
-				m_translateTransform.X = m_transformXStart + vector.X;
-				m_translateTransform.Y = m_transformYStart + vector.Y;
+				double widthDifference = Math.Max(0, contentBounds.Width - ActualWidth);
+				double heightDifference = Math.Max(0, contentBounds.Height - ActualHeight);
+
+				double newX = LimitValue(m_transformXStart + vector.X, widthDifference);
+				double newY = LimitValue(m_transformYStart + vector.Y, widthDifference);
+
+				m_translateTransform.X = newX;
+				m_translateTransform.Y = newY;
 			}
+		}
+
+		private double LimitValue(double value, double absMaxValue)
+		{
+			if (value > absMaxValue)
+				value = absMaxValue;
+			else if (value < -absMaxValue)
+				value = -absMaxValue;
+
+			return value;
 		}
 
 		const double c_scaleIncrement = 0.5;
 
-		UIElement m_content;
+		FrameworkElement m_content;
 		ScaleTransform m_scaleTransform;
 		TranslateTransform m_translateTransform;
 		
