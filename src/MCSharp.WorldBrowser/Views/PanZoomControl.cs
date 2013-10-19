@@ -89,7 +89,9 @@ namespace MCSharp.WorldBrowser.Views
 		protected override void OnMouseWheel(MouseWheelEventArgs e)
 		{
 			Point mousePoint = e.GetPosition(this);
-
+			Rect contentBounds = VisualTreeHelper.GetContentBounds(m_content);
+			Rect initialBounds = m_scaleTransform.TransformBounds(contentBounds);
+			
 			if (e.Delta > 0)
 			{
 				m_scaleTransform.ScaleX += c_scaleIncrement;
@@ -100,6 +102,12 @@ namespace MCSharp.WorldBrowser.Views
 				m_scaleTransform.ScaleX = Math.Max(1, m_scaleTransform.ScaleX - c_scaleIncrement);
 				m_scaleTransform.ScaleY = Math.Max(1, m_scaleTransform.ScaleY - c_scaleIncrement);
 			}
+
+			Rect finalBounds = m_scaleTransform.TransformBounds(contentBounds);
+			double widthChange = initialBounds.Width - finalBounds.Width;
+			double offsetChange = widthChange / 2;
+			TranslateX(m_translateTransform.X + offsetChange, finalBounds);
+			TranslateY(m_translateTransform.Y + offsetChange, finalBounds);
 		}
 
 		protected override void OnMouseEnter(MouseEventArgs e)
@@ -132,18 +140,24 @@ namespace MCSharp.WorldBrowser.Views
 			{
 				Vector vector = e.GetPosition(this) - m_captureStart;
 				
-				// calculate the bounds of the content currently
+				// calculate the bounds of the content
 				Rect contentBounds = m_scaleTransform.TransformBounds(VisualTreeHelper.GetContentBounds(m_content));
-
-				double widthDifference = Math.Max(0, contentBounds.Width - ActualWidth);
-				double heightDifference = Math.Max(0, contentBounds.Height - ActualHeight);
-
-				double newX = LimitValue(m_transformXStart + vector.X, widthDifference);
-				double newY = LimitValue(m_transformYStart + vector.Y, widthDifference);
-
-				m_translateTransform.X = newX;
-				m_translateTransform.Y = newY;
+				
+				TranslateX(m_transformXStart + vector.X, contentBounds);
+				TranslateY(m_transformYStart + vector.Y, contentBounds);
 			}
+		}
+
+		private void TranslateX(double newX, Rect contentBounds)
+		{
+			double widthDifference = Math.Max(0, contentBounds.Width - ActualWidth);
+			m_translateTransform.X = LimitValue(newX, widthDifference);
+		}
+
+		private void TranslateY(double newY, Rect contentBounds)
+		{
+			double heightDifference = Math.Max(0, contentBounds.Height - ActualHeight);
+			m_translateTransform.Y = LimitValue(newY, heightDifference);
 		}
 
 		private double LimitValue(double value, double absMaxValue)
