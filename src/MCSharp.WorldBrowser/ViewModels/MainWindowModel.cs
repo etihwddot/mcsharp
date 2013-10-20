@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Logos.Utility;
+using MCSharp.Utility;
 
 namespace MCSharp.WorldBrowser.ViewModels
 {
@@ -156,18 +157,18 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 						int height = chunk.GetHeight(x, z);
 
-						Color color = GetColorForBiomeKind(biome);
+						Color32 color = GetColorForBiomeKind(biome);
 
 						if (lastHeight.HasValue && height > lastHeight)
-							color = BlendWith(color, Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+							color = BlendWith(color, Color32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
 						if (lastHeight.HasValue && height < lastHeight)
-							color = BlendWith(color, Color.FromArgb(0x50, 0x00, 0x00, 0x00));
+							color = BlendWith(color, Color32.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-						int pixelStart = (x + xOffset + ((z + zOffset)*Constants.RegionBlockWidth))*s_bytesPerPixel;
-						bytes[pixelStart] = color.B;
-						bytes[pixelStart + 1] = color.G;
-						bytes[pixelStart + 2] = color.R;
-						bytes[pixelStart + 3] = color.A;
+						int pixelStart = (x + xOffset + ((z + zOffset) * Constants.RegionBlockWidth)) * s_bytesPerPixel;
+						bytes[pixelStart] = color.Blue;
+						bytes[pixelStart + 1] = color.Green;
+						bytes[pixelStart + 2] = color.Red;
+						bytes[pixelStart + 3] = color.Alpha;
 
 						lastHeight = height;
 					}
@@ -177,61 +178,61 @@ namespace MCSharp.WorldBrowser.ViewModels
 			return bytes;
 		}
 
-		private static Color BlendWith(Color background, Color overlay)
+		private static Color32 BlendWith(Color32 background, Color32 overlay)
 		{
 			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-			double alpha = overlay.A / 256.0;
+			double alpha = overlay.Alpha / 256.0;
 
-			byte blendedR = (byte) (overlay.R * alpha + background.R * (1 - alpha));
-			byte blendedG = (byte) (overlay.G * alpha + background.G * (1 - alpha));
-			byte blendedB = (byte) (overlay.B * alpha + background.B * (1 - alpha));
-			return Color.FromRgb(blendedR, blendedG, blendedB);
+			byte blendedR = (byte) (overlay.Red * alpha + background.Red * (1 - alpha));
+			byte blendedG = (byte) (overlay.Green * alpha + background.Green * (1 - alpha));
+			byte blendedB = (byte) (overlay.Blue * alpha + background.Blue * (1 - alpha));
+			return Color32.FromRgb(blendedR, blendedG, blendedB);
 		}
 
-		private static Color GetColorForBiomeKind(BiomeKind biome)
+		private static Color32 GetColorForBiomeKind(BiomeKind biome)
 		{
 			switch (biome)
 			{
-			case BiomeKind.Uncalculated: return Colors.Black;
-			case BiomeKind.DeepOcean: return Colors.DarkBlue;
-			case BiomeKind.Ocean: return Colors.Blue;
-			case BiomeKind.River: return Colors.LightBlue;
-			case BiomeKind.Beach: return Colors.LightYellow;
+			case BiomeKind.Uncalculated: return NamedColors.Black;
+			case BiomeKind.DeepOcean: return NamedColors.DarkBlue;
+			case BiomeKind.Ocean: return NamedColors.Blue;
+			case BiomeKind.River: return NamedColors.LightBlue;
+			case BiomeKind.Beach: return NamedColors.LightYellow;
 
 			case BiomeKind.SunflowerPlains:
-				return s_random.Next(31) < 30 ? Colors.Green : Colors.Yellow;
+				return s_random.Next(31) < 30 ? NamedColors.Green : NamedColors.Yellow;
 
-			case BiomeKind.Plains: return Colors.Green;
-			case BiomeKind.Forest: return Colors.DarkGreen;
-			case BiomeKind.ForestHills: return Colors.DarkGreen;
-			case BiomeKind.ExtremeHills: return Colors.DarkGray;
-			case BiomeKind.ExtremeHillsEdge: return Colors.LightGray;
+			case BiomeKind.Plains: return NamedColors.Green;
+			case BiomeKind.Forest: return NamedColors.DarkGreen;
+			case BiomeKind.ForestHills: return NamedColors.DarkGreen;
+			case BiomeKind.ExtremeHills: return NamedColors.DarkGray;
+			case BiomeKind.ExtremeHillsEdge: return NamedColors.LightGray;
 
 			// ExtremeHills+ has trees; randomly add some green pixels
 			case BiomeKind.ExtremeHillsPlus:
-				return s_random.Next(11) < 10 ? Colors.DarkGray : Colors.ForestGreen;
+				return s_random.Next(11) < 10 ? NamedColors.DarkGray : NamedColors.ForestGreen;
 
-			case BiomeKind.Swampland: return Colors.DarkOliveGreen;
-			case BiomeKind.Jungle: return Color.FromRgb(0x0D, 0x35, 0x01);
-			case BiomeKind.JungleHills: return Color.FromRgb(0x0D, 0x35, 0x01);
-			case BiomeKind.Desert: return Color.FromRgb(0xDB, 0xD3, 0xA0);
-			case BiomeKind.DesertHills: return Color.FromRgb(0xDB, 0xD3, 0xA0);
-			case BiomeKind.ColdTaiga: return Colors.White;
-			case BiomeKind.ColdTaigaHills: return Colors.WhiteSmoke;
-			case BiomeKind.Taiga: return Colors.ForestGreen;
-			case BiomeKind.TaigaHills: return Colors.ForestGreen;
-			case BiomeKind.IcePlains: return Colors.White;
-			case BiomeKind.IceMountains: return Colors.White;
-			case BiomeKind.FrozenRiver: return Colors.AntiqueWhite;
-			case BiomeKind.FrozenOcean: return Colors.CornflowerBlue;
-			case BiomeKind.ColdBeach: return Colors.Beige;
-			case BiomeKind.StoneBeach: return Colors.DarkGray;
+			case BiomeKind.Swampland: return NamedColors.DarkOliveGreen;
+			case BiomeKind.Jungle: return Color32.FromRgb(0x0D, 0x35, 0x01);
+			case BiomeKind.JungleHills: return Color32.FromRgb(0x0D, 0x35, 0x01);
+			case BiomeKind.Desert: return Color32.FromRgb(0xDB, 0xD3, 0xA0);
+			case BiomeKind.DesertHills: return Color32.FromRgb(0xDB, 0xD3, 0xA0);
+			case BiomeKind.ColdTaiga: return NamedColors.White;
+			case BiomeKind.ColdTaigaHills: return NamedColors.WhiteSmoke;
+			case BiomeKind.Taiga: return NamedColors.ForestGreen;
+			case BiomeKind.TaigaHills: return NamedColors.ForestGreen;
+			case BiomeKind.IcePlains: return NamedColors.White;
+			case BiomeKind.IceMountains: return NamedColors.White;
+			case BiomeKind.FrozenRiver: return NamedColors.AntiqueWhite;
+			case BiomeKind.FrozenOcean: return NamedColors.CornflowerBlue;
+			case BiomeKind.ColdBeach: return NamedColors.Beige;
+			case BiomeKind.StoneBeach: return NamedColors.DarkGray;
 
 			// RoofedForest has mushrooms; randomly add some red and tan pixels
 			case BiomeKind.RoofedForest:
 				int value = s_random.Next(100);
-				return value < 98 ? Colors.ForestGreen : value < 99 ? Colors.Tan : Colors.Red;
-			default: return Colors.Red;
+				return value < 98 ? NamedColors.ForestGreen : value < 99 ? NamedColors.Tan : NamedColors.Red;
+			default: return NamedColors.Red;
 			}
 		}
 
