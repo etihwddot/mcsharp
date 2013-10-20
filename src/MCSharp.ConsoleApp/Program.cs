@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using MCSharp.Utility;
 
 namespace MCSharp.ConsoleApp
 {
@@ -113,14 +114,15 @@ namespace MCSharp.ConsoleApp
 										hillshade = 0;
 								}
 
-								hillshade = (int)hillshade;
+								hillshade = (int) hillshade;
 
+								byte hillshadeByte = (byte) hillshade;
 
-								Color color = GetColorForBiomeKind(biome);
-								Color overlay = Color.FromArgb(150, (int)hillshade, (int)hillshade, (int)hillshade);
+								Color32 color = BiomeKindUtility.GetColor(biome);
+								Color32 overlay = Color32.FromArgb(150, hillshadeByte, hillshadeByte, hillshadeByte);
 
 								if (hillshade == 180)
-									overlay = Color.FromArgb(100, (int)hillshade, (int)hillshade, (int)hillshade);
+									overlay = Color32.FromArgb(100, hillshadeByte, hillshadeByte, hillshadeByte);
 
 								bitmapWriter.SetPixel(imageX, imageY, BlendWith(color, overlay));
 							}
@@ -152,65 +154,15 @@ namespace MCSharp.ConsoleApp
 			Console.WriteLine("Total time: {0}", stopwatchTotal.ElapsedMilliseconds);
 		}
 
-		private static Color BlendWith(Color background, Color overlay)
+		private static Color BlendWith(Color32 background, Color32 overlay)
 		{
 			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-			var alpha = overlay.A / 256.0;
+			var alpha = overlay.Alpha / 256.0;
 
-			var blendedR = (byte)(overlay.R * alpha + background.R * (1 - alpha));
-			var blendedG = (byte)(overlay.G * alpha + background.G * (1 - alpha));
-			var blendedB = (byte)(overlay.B * alpha + background.B * (1 - alpha));
+			var blendedR = (byte)(overlay.Red * alpha + background.Red * (1 - alpha));
+			var blendedG = (byte)(overlay.Green * alpha + background.Green * (1 - alpha));
+			var blendedB = (byte)(overlay.Blue * alpha + background.Blue * (1 - alpha));
 			return Color.FromArgb(blendedR, blendedG, blendedB);
-		}
-
-		private static Color GetColorForBiomeKind(BiomeKind biome)
-		{
-			switch (biome)
-			{
-				case BiomeKind.Uncalculated: return Color.Black;
-				case BiomeKind.DeepOcean: return Color.DarkBlue;
-				case BiomeKind.Ocean: return Color.Blue;
-				case BiomeKind.River: return Color.LightBlue;
-				case BiomeKind.Beach: return Color.LightYellow;
-
-				case BiomeKind.SunflowerPlains:
-					return rng.Next(31) < 30 ? Color.Green : Color.Yellow;
-
-				case BiomeKind.Plains: return Color.Green;
-				case BiomeKind.FlowerForest: return Color.Green; // TODO: add flowers
-				case BiomeKind.BirchForest: return Color.DarkSeaGreen;
-				case BiomeKind.Forest: return Color.DarkGreen;
-				case BiomeKind.ForestHills: return Color.DarkGreen;
-				case BiomeKind.ExtremeHills: return Color.DarkGray;
-				case BiomeKind.ExtremeHillsEdge: return Color.LightGray;
-
-				// ExtremeHills+ has trees; randomly add some green pixels
-				case BiomeKind.ExtremeHillsPlus:
-					return rng.Next(11) < 10 ? Color.DarkGray : Color.ForestGreen;
-
-				case BiomeKind.Swampland: return Color.DarkOliveGreen;
-				case BiomeKind.Jungle: return Color.FromArgb(0x0D, 0x35, 0x01);
-				case BiomeKind.JungleHills: return Color.FromArgb(0x0D, 0x35, 0x01);
-				case BiomeKind.Desert: return Color.FromArgb(0xDB, 0xD3, 0xA0);
-				case BiomeKind.DesertHills: return Color.FromArgb(0xDB, 0xD3, 0xA0);
-				case BiomeKind.ColdTaiga: return Color.White;
-				case BiomeKind.ColdTaigaHills: return Color.WhiteSmoke;
-				case BiomeKind.MegaTaiga: return Color.ForestGreen;
-				case BiomeKind.Taiga: return Color.ForestGreen;
-				case BiomeKind.TaigaHills: return Color.ForestGreen;
-				case BiomeKind.IcePlains: return Color.White;
-				case BiomeKind.IceMountains: return Color.White;
-				case BiomeKind.FrozenRiver: return Color.AntiqueWhite;
-				case BiomeKind.FrozenOcean: return Color.CornflowerBlue;
-				case BiomeKind.ColdBeach: return Color.Beige;
-				case BiomeKind.StoneBeach: return Color.DarkGray;
-
-				// RoofedForest has mushrooms; randomly add some red and tan pixels
-				case BiomeKind.RoofedForest:
-					int value = rng.Next(100);
-					return value < 98 ? Color.ForestGreen : value < 99 ? Color.Tan : Color.Red;
-				default: return Color.Red;
-			}
 		}
 
 		// hillshading setup
