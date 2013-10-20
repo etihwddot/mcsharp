@@ -157,7 +157,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 						int height = chunk.GetHeight(x, z);
 
-						Color32 color = GetColorForBiomeKind(biome);
+						Color32 color = BiomeKindUtility.GetColor(biome);
 
 						if (lastHeight.HasValue && height > lastHeight)
 							color = BlendWith(color, Color32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
@@ -189,54 +189,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 			return Color32.FromRgb(blendedR, blendedG, blendedB);
 		}
 
-		private static Color32 GetColorForBiomeKind(BiomeKind biome)
-		{
-			switch (biome)
-			{
-			case BiomeKind.Uncalculated: return NamedColors.Black;
-			case BiomeKind.DeepOcean: return NamedColors.DarkBlue;
-			case BiomeKind.Ocean: return NamedColors.Blue;
-			case BiomeKind.River: return NamedColors.LightBlue;
-			case BiomeKind.Beach: return NamedColors.LightYellow;
-
-			case BiomeKind.SunflowerPlains:
-				return s_random.Next(31) < 30 ? NamedColors.Green : NamedColors.Yellow;
-
-			case BiomeKind.Plains: return NamedColors.Green;
-			case BiomeKind.Forest: return NamedColors.DarkGreen;
-			case BiomeKind.ForestHills: return NamedColors.DarkGreen;
-			case BiomeKind.ExtremeHills: return NamedColors.DarkGray;
-			case BiomeKind.ExtremeHillsEdge: return NamedColors.LightGray;
-
-			// ExtremeHills+ has trees; randomly add some green pixels
-			case BiomeKind.ExtremeHillsPlus:
-				return s_random.Next(11) < 10 ? NamedColors.DarkGray : NamedColors.ForestGreen;
-
-			case BiomeKind.Swampland: return NamedColors.DarkOliveGreen;
-			case BiomeKind.Jungle: return Color32.FromRgb(0x0D, 0x35, 0x01);
-			case BiomeKind.JungleHills: return Color32.FromRgb(0x0D, 0x35, 0x01);
-			case BiomeKind.Desert: return Color32.FromRgb(0xDB, 0xD3, 0xA0);
-			case BiomeKind.DesertHills: return Color32.FromRgb(0xDB, 0xD3, 0xA0);
-			case BiomeKind.ColdTaiga: return NamedColors.White;
-			case BiomeKind.ColdTaigaHills: return NamedColors.WhiteSmoke;
-			case BiomeKind.Taiga: return NamedColors.ForestGreen;
-			case BiomeKind.TaigaHills: return NamedColors.ForestGreen;
-			case BiomeKind.IcePlains: return NamedColors.White;
-			case BiomeKind.IceMountains: return NamedColors.White;
-			case BiomeKind.FrozenRiver: return NamedColors.AntiqueWhite;
-			case BiomeKind.FrozenOcean: return NamedColors.CornflowerBlue;
-			case BiomeKind.ColdBeach: return NamedColors.Beige;
-			case BiomeKind.StoneBeach: return NamedColors.DarkGray;
-
-			// RoofedForest has mushrooms; randomly add some red and tan pixels
-			case BiomeKind.RoofedForest:
-				int value = s_random.Next(100);
-				return value < 98 ? NamedColors.ForestGreen : value < 99 ? NamedColors.Tan : NamedColors.Red;
-			default: return NamedColors.Red;
-			}
-		}
-
-		static readonly Random s_random = new Random();
 		static readonly PixelFormat s_pixelFormat = PixelFormats.Bgra32;
 		static readonly int s_bytesPerPixel = s_pixelFormat.BitsPerPixel / 8;
 

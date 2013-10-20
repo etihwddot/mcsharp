@@ -74,6 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionFile.cs" />
     <Compile Include="GameSaveBounds.cs" />
+    <Compile Include="Utility\BiomeKindUtility.cs" />
     <Compile Include="Utility\Color32.cs" />
     <Compile Include="Utility\NamedColors.cs" />
   </ItemGroup>
