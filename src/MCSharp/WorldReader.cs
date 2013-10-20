@@ -43,8 +43,8 @@ namespace MCSharp
 
 		private RegionReader GetRegionContainingChunk(int chunkX, int chunkZ)
 		{
-			int regionX = chunkX / Constants.RegionChunkWidth - (chunkX < 0 ? 1 : 0);
-			int regionZ = chunkZ / Constants.RegionChunkWidth - (chunkZ < 0 ? 1 : 0);
+			int regionX = (int) Math.Floor((double) chunkX / Constants.RegionChunkWidth);
+			int regionZ = (int) Math.Floor((double) chunkZ / Constants.RegionChunkWidth);
 
 			return new RegionReader(m_saveFolder, regionX, regionZ);
 		}
