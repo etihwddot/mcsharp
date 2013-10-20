@@ -33,8 +33,6 @@ namespace MCSharp.ConsoleApp
 		{
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
-			object lockObject = new object();
-
 			WorldReader reader = new WorldReader(saveInfo.Location);
 
 			var task = reader.GetCurrentWorldBoundsAsync();
