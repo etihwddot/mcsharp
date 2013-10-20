@@ -49,7 +49,6 @@ namespace MCSharp
 			return new RegionReader(m_saveFolder, regionX, regionZ);
 		}
 
-
 		sealed class RegionReader : IDisposable
 		{
 			public RegionReader(string saveFolder, int regionX, int regionZ)
