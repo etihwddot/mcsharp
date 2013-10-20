@@ -41,9 +41,9 @@ namespace MCSharp.ConsoleApp
 				// cache height for each block
 				Dictionary<int, ChunkData> chunkCache = new Dictionary<int, ChunkData>();
 				
-				for (int zChunk = bounds.MinZChunk; zChunk <= bounds.MaxZChunk; zChunk++)
+				for (int zChunk = bounds.MinZChunk; zChunk < bounds.MaxZChunk; zChunk++)
 				{
-					for (int xChunk = bounds.MinXChunk; xChunk <= bounds.MaxXChunk; xChunk++)
+					for (int xChunk = bounds.MinXChunk; xChunk < bounds.MaxXChunk; xChunk++)
 					{
 						ChunkData chunk = await GetChunk(reader, bounds, xChunk, zChunk, chunkCache);
 						if (chunk == null || chunk.IsEmpty)
@@ -130,14 +130,14 @@ namespace MCSharp.ConsoleApp
 
 		private static async Task<ChunkData> GetChunk(WorldReader reader, GameSaveBounds bounds, int chunkX, int chunkZ, Dictionary<int, ChunkData> cache)
 		{
-			int cacheOffset = chunkX + chunkZ * bounds.ChunkWidth;
+			int cacheOffset = (chunkX - bounds.MinXChunk) + (chunkZ - bounds.MinZChunk) * bounds.ChunkWidth;
 
 			ChunkData chunk;
 			if (cache.TryGetValue(cacheOffset, out chunk))
 				return chunk;
 
 			chunk = await reader.GetChunkForChunkCoordinateAsync(chunkX, chunkZ);
-			cache[cacheOffset] = chunk;
+			cache.Add(cacheOffset, chunk);
 			return chunk;
 		}
 
