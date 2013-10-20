@@ -17,8 +17,8 @@ namespace MCSharp.ConsoleApp
 		{
 			string outputLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), @"map.png");
 
-			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
-			// GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
+			// GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
+			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
 			{
 				Console.WriteLine("Unable to load save.");
@@ -38,83 +38,95 @@ namespace MCSharp.ConsoleApp
 
 			Bitmap bitmap = new Bitmap(bounds.BlockWidth, bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
-			{				
-				Parallel.For(bounds.MinZChunk, bounds.MaxZChunk, (zChunk) =>
+			{
+				Parallel.For(bounds.MinZ, bounds.MaxZ + 1, (zRegion) =>
 				{
-					Parallel.For(bounds.MinXChunk, bounds.MaxXChunk, (xChunk) =>
+					Parallel.For(bounds.MinX, bounds.MaxX + 1, (xRegion) =>
 					{
-						ChunkData chunk = GetChunk(reader, xChunk, zChunk);
-						if (chunk.IsEmpty)
-							return;
+						int zStart = zRegion * Constants.RegionChunkWidth;
+						int zEnd = zStart + Constants.RegionChunkWidth;
 
-						int chunkLeft = chunk.XPosition.Value * Constants.ChunkBlockWidth;
-						int chunkTop = chunk.ZPosition.Value * Constants.ChunkBlockWidth;
-
-						int xOffset = chunkLeft - bounds.MinXBlock;
-						int zOffset = chunkTop - bounds.MinZBlock;
-
-						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+						for (int zChunk = zStart; zChunk < zEnd; zChunk++)
 						{
-							for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+							int xStart = xRegion * Constants.RegionChunkWidth;
+							int xEnd = xStart + Constants.RegionChunkWidth;
+
+							for (int xChunk = xStart; xChunk < xEnd; xChunk++)
 							{
-								int imageX = x + xOffset;
-								int imageY = z + zOffset;
+								ChunkData chunk = GetChunk(reader, xChunk, zChunk);
+								if (chunk.IsEmpty)
+									continue;
 
-								BiomeKind biome = chunk.GetBiome(x, z);
+								int chunkLeft = chunk.XPosition.Value * Constants.ChunkBlockWidth;
+								int chunkTop = chunk.ZPosition.Value * Constants.ChunkBlockWidth;
 
-								// calculate hillshade value
-								double hillshade = 0;
-								if (imageX > 0 && imageX < bounds.BlockWidth - 1 && imageY > 0 && imageY < bounds.BlockHeight - 1)
+								int xOffset = chunkLeft - bounds.MinXBlock;
+								int zOffset = chunkTop - bounds.MinZBlock;
+
+								for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 								{
-									double a = GetBlockHeight(chunk, z - 1, x - 1, reader);
-									double b = GetBlockHeight(chunk, z - 1, x, reader);
-									double c = GetBlockHeight(chunk, z - 1, x + 1, reader);
-									double d = GetBlockHeight(chunk, z, x - 1, reader);
-									double e = GetBlockHeight(chunk, z, x, reader);
-									double f = GetBlockHeight(chunk, z, x + 1, reader);
-									double g = GetBlockHeight(chunk, z + 1, x - 1, reader);
-									double h = GetBlockHeight(chunk, z + 1, x, reader);
-									double i = GetBlockHeight(chunk, z + 1, x + 1, reader);
-
-									// compute hillshade
-									const int cellsize = 4; // no idea what this is...
-									const double zFactor = 0.25; // no idea what this is...
-
-									double dzOverDx = ((c + 2 * f + i) - (a + 2 * d + g)) / 8 * cellsize;
-									double dzOverDy = ((g + 2 * h + i) - (a + 2 * b + c)) / 8 * cellsize;
-
-									double slopeRad = Math.Atan(zFactor * Math.Sqrt(Math.Pow(dzOverDx, 2) + Math.Pow(dzOverDy, 2)));
-									double aspectRad = 0;
-									if (dzOverDx != 0)
+									for (int x = 0; x < Constants.ChunkBlockWidth; x++)
 									{
-										aspectRad = Math.Atan2(dzOverDy, -dzOverDx);
-										if (aspectRad < 0)
-											aspectRad = 2 * Math.PI + aspectRad;
-									}
-									else if (dzOverDx == 0)
-									{
-										if (dzOverDy > 0)
-											aspectRad = Math.PI / 2.0;
-										else if (dzOverDy < 0)
-											aspectRad = 2 * Math.PI - Math.PI / 2;
-										else
-											aspectRad = aspectRad;
-									}
+										int imageX = x + xOffset;
+										int imageY = z + zOffset;
 
-									hillshade = 255.0 * ((Math.Cos(c_zenithRadians) * Math.Cos(slopeRad)) + (Math.Sin(c_zenithRadians) * Math.Sin(slopeRad) * Math.Cos(c_azimuthRadians - aspectRad)));
-									if (hillshade < 0)
-										hillshade = 0;
+										BiomeKind biome = chunk.GetBiome(x, z);
+
+										// calculate hillshade value
+										double hillshade = 0;
+										if (imageX > 0 && imageX < bounds.BlockWidth - 1 && imageY > 0 && imageY < bounds.BlockHeight - 1)
+										{
+											double a = GetBlockHeight(chunk, z - 1, x - 1, reader);
+											double b = GetBlockHeight(chunk, z - 1, x, reader);
+											double c = GetBlockHeight(chunk, z - 1, x + 1, reader);
+											double d = GetBlockHeight(chunk, z, x - 1, reader);
+											double e = GetBlockHeight(chunk, z, x, reader);
+											double f = GetBlockHeight(chunk, z, x + 1, reader);
+											double g = GetBlockHeight(chunk, z + 1, x - 1, reader);
+											double h = GetBlockHeight(chunk, z + 1, x, reader);
+											double i = GetBlockHeight(chunk, z + 1, x + 1, reader);
+
+											// compute hillshade
+											const int cellsize = 4; // no idea what this is...
+											const double zFactor = 0.25; // no idea what this is...
+
+											double dzOverDx = ((c + 2 * f + i) - (a + 2 * d + g)) / 8 * cellsize;
+											double dzOverDy = ((g + 2 * h + i) - (a + 2 * b + c)) / 8 * cellsize;
+
+											double slopeRad = Math.Atan(zFactor * Math.Sqrt(Math.Pow(dzOverDx, 2) + Math.Pow(dzOverDy, 2)));
+											double aspectRad = 0;
+											if (dzOverDx != 0)
+											{
+												aspectRad = Math.Atan2(dzOverDy, -dzOverDx);
+												if (aspectRad < 0)
+													aspectRad = 2 * Math.PI + aspectRad;
+											}
+											else if (dzOverDx == 0)
+											{
+												if (dzOverDy > 0)
+													aspectRad = Math.PI / 2.0;
+												else if (dzOverDy < 0)
+													aspectRad = 2 * Math.PI - Math.PI / 2;
+												else
+													aspectRad = aspectRad;
+											}
+
+											hillshade = 255.0 * ((Math.Cos(c_zenithRadians) * Math.Cos(slopeRad)) + (Math.Sin(c_zenithRadians) * Math.Sin(slopeRad) * Math.Cos(c_azimuthRadians - aspectRad)));
+											if (hillshade < 0)
+												hillshade = 0;
+										}
+
+										hillshade = (int) hillshade;
+
+										Color color = GetColorForBiomeKind(biome);
+										Color overlay = Color.FromArgb(150, (int) hillshade, (int) hillshade, (int) hillshade);
+
+										if (hillshade == 180)
+											overlay = Color.FromArgb(100, (int) hillshade, (int) hillshade, (int) hillshade);
+
+										bitmapWriter.SetPixel(imageX, imageY, BlendWith(color, overlay));
+									}
 								}
-
-								hillshade = (int) hillshade;
-
-								Color color = GetColorForBiomeKind(biome);
-								Color overlay = Color.FromArgb(150, (int) hillshade, (int) hillshade, (int) hillshade);
-
-								if (hillshade == 180)
-									overlay = Color.FromArgb(100, (int) hillshade, (int) hillshade, (int) hillshade);
-
-								bitmapWriter.SetPixel(imageX, imageY, BlendWith(color, overlay));
 							}
 						}
 					});

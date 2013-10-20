@@ -154,7 +154,7 @@ namespace MCSharp
 		const string c_regionExtension = "*.mca";
 		const string c_regionFileNameFormat = "r.{0}.{1}.mca";
 
-		const int c_maxCacheSize = 10000;
+		const int c_maxCacheSize = 20000;
 
 		readonly string m_saveFolder;
 		readonly ConcurrentDictionary<int, ChunkData> m_cache;
