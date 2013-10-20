@@ -6,8 +6,8 @@
 	xmlns:view="clr-namespace:MCSharp.WorldBrowser.Views"
     Title="World Browser"
 	FontSize="12pt"
-	Height="600"
-	Width="800">
+	Height="800"
+	Width="1024">
 	
 	<Window.Resources>
 		<DataTemplate DataType="{x:Type mcs:GameSaveInfo}">
@@ -22,13 +22,13 @@
 		</DataTemplate>
 	</Window.Resources>
 	
-    <Grid Margin="8">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
-		</Grid.RowDefinitions>
+    <Grid Margin="8">		
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
 		
-		<StackPanel>
+		<StackPanel Width="300">
 			<TextBlock
 				Text="Save:"
 				Margin="0,0,4,0" />
@@ -41,7 +41,7 @@
 			<TextBlock Text="{Binding Elapsed}" />
 		</StackPanel>
 
-		<view:PanZoomControl Grid.Row="1">
+		<view:PanZoomControl Grid.Column="1">
 			<Image Source="{Binding Image}" Stretch="Uniform" />
 		</view:PanZoomControl>
 	</Grid>
