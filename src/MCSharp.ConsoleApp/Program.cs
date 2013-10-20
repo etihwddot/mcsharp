@@ -45,13 +45,13 @@ namespace MCSharp.ConsoleApp
 				// cache height for each block
 				ConcurrentDictionary<int, ChunkData> chunkCache = new ConcurrentDictionary<int, ChunkData>();
 				
-				var result = Parallel.For(bounds.MinZChunk, bounds.MaxZChunk, (zChunk) =>
+				Parallel.For(bounds.MinZChunk, bounds.MaxZChunk, (zChunk) =>
 				{
-					for (int xChunk = bounds.MinXChunk; xChunk < bounds.MaxXChunk; xChunk++)
+					Parallel.For(bounds.MinXChunk, bounds.MaxXChunk, (xChunk) =>
 					{
 						ChunkData chunk = GetChunk(reader, bounds, xChunk, zChunk, chunkCache);
-						if (chunk == null || chunk.IsEmpty)
-							continue;
+						if (chunk.IsEmpty)
+							return;
 
 						int chunkLeft = chunk.XPosition.Value * Constants.ChunkBlockWidth;
 						int chunkTop = chunk.ZPosition.Value * Constants.ChunkBlockWidth;
@@ -123,7 +123,7 @@ namespace MCSharp.ConsoleApp
 								bitmapWriter.SetPixel(imageX, imageY, BlendWith(color, overlay));
 							}
 						}
-					}
+					});
 				});
 			}
 
