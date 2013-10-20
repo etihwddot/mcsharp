@@ -42,7 +42,7 @@ namespace MCSharp.ConsoleApp
 			Bitmap bitmap = new Bitmap(bounds.BlockWidth, bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
-				// cache height for each block
+				// cache chunks
 				ConcurrentDictionary<int, ChunkData> chunkCache = new ConcurrentDictionary<int, ChunkData>();
 				
 				Parallel.For(bounds.MinZChunk, bounds.MaxZChunk, (zChunk) =>
