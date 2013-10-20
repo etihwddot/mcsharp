@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,30 +15,47 @@ namespace MCSharp
 		public WorldReader(string saveFolder)
 		{
 			m_saveFolder = saveFolder;
+			
+			// cache chunks in dictionary
+			m_cache = new ConcurrentDictionary<int, ChunkData>();
+
+			// use simple fifo eviction
+			m_evictionOrder = new ConcurrentQueue<int>();
+
+			m_lazyBounds = new Lazy<GameSaveBounds>(GetWorldBounds);
 		}
 
-		public Task<GameSaveBounds> GetCurrentWorldBoundsAsync()
+		public GameSaveBounds Bounds
 		{
-			return Task.Run(() =>
-			{
-				var files = Directory.GetFiles(Path.Combine(m_saveFolder, c_regionFolderName), c_regionExtension);
-				return files.Aggregate(GameSaveBounds.CreateDefault(), (bounds, file) =>
-				{
-					string regionFileName = Path.GetFileName(file);
-					string[] regionFileNameParts = regionFileName.Split('.');
-					int x = int.Parse(regionFileNameParts[1]);
-					int z = int.Parse(regionFileNameParts[2]);
-					return bounds.Union(x, z);
-				});
-			});
+			get { return m_lazyBounds.Value; }
 		}
 
 		public Task<ChunkData> GetChunkForChunkCoordinateAsync(int chunkX, int chunkZ)
 		{
 			return Task.Run(() =>
 			{
-				using (var regionReader = GetRegionContainingChunk(chunkX, chunkZ))
-					return regionReader.ReadChunkData(chunkX, chunkZ);
+				int cacheOffset = (chunkX - Bounds.MinXChunk) + (chunkZ - Bounds.MinZChunk) * Bounds.ChunkWidth;
+
+				ChunkData chunk;
+				if (m_cache.TryGetValue(cacheOffset, out chunk))
+					return chunk;
+
+				using (RegionReader regionReader = GetRegionContainingChunk(chunkX, chunkZ))
+				{
+					chunk = regionReader.ReadChunkData(chunkX, chunkZ);
+					m_cache[cacheOffset] = chunk;
+					m_evictionOrder.Enqueue(cacheOffset);
+
+					if (m_evictionOrder.Count > c_maxCacheSize)
+					{
+						int removeIndex;
+						ChunkData removed;
+						if (m_evictionOrder.TryDequeue(out removeIndex))
+							m_cache.TryRemove(removeIndex, out removed);
+					}
+
+					return chunk;
+				}
 			});
 		}
 
@@ -47,6 +65,19 @@ namespace MCSharp
 			int regionZ = (int) Math.Floor((double) chunkZ / Constants.RegionChunkWidth);
 
 			return new RegionReader(m_saveFolder, regionX, regionZ);
+		}
+
+		private GameSaveBounds GetWorldBounds()
+		{
+			string[] files = Directory.GetFiles(Path.Combine(m_saveFolder, c_regionFolderName), c_regionExtension);
+			return files.Aggregate(GameSaveBounds.CreateDefault(), (bounds, file) =>
+			{
+				string regionFileName = Path.GetFileName(file);
+				string[] regionFileNameParts = regionFileName.Split('.');
+				int x = int.Parse(regionFileNameParts[1]);
+				int z = int.Parse(regionFileNameParts[2]);
+				return bounds.Union(x, z);
+			});
 		}
 
 		sealed class RegionReader : IDisposable
@@ -123,7 +154,11 @@ namespace MCSharp
 		const string c_regionExtension = "*.mca";
 		const string c_regionFileNameFormat = "r.{0}.{1}.mca";
 
+		const int c_maxCacheSize = 200000;
 
 		readonly string m_saveFolder;
+		readonly ConcurrentDictionary<int, ChunkData> m_cache;
+		readonly ConcurrentQueue<int> m_evictionOrder;
+		readonly Lazy<GameSaveBounds> m_lazyBounds;
 	}
 }

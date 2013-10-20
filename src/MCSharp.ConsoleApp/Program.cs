@@ -34,22 +34,16 @@ namespace MCSharp.ConsoleApp
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
 			WorldReader reader = new WorldReader(saveInfo.Location);
-
-			var task = reader.GetCurrentWorldBoundsAsync();
-			task.Wait();
-			GameSaveBounds bounds = task.Result;
+			GameSaveBounds bounds = reader.Bounds;
 
 			Bitmap bitmap = new Bitmap(bounds.BlockWidth, bounds.BlockHeight);
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
-			{
-				// cache chunks
-				ConcurrentDictionary<int, ChunkData> chunkCache = new ConcurrentDictionary<int, ChunkData>();
-				
+			{				
 				Parallel.For(bounds.MinZChunk, bounds.MaxZChunk, (zChunk) =>
 				{
 					Parallel.For(bounds.MinXChunk, bounds.MaxXChunk, (xChunk) =>
 					{
-						ChunkData chunk = GetChunk(reader, bounds, xChunk, zChunk, chunkCache);
+						ChunkData chunk = GetChunk(reader, xChunk, zChunk);
 						if (chunk.IsEmpty)
 							return;
 
@@ -72,15 +66,15 @@ namespace MCSharp.ConsoleApp
 								double hillshade = 0;
 								if (imageX > 0 && imageX < bounds.BlockWidth - 1 && imageY > 0 && imageY < bounds.BlockHeight - 1)
 								{
-									double a = GetBlockHeight(chunk, z - 1, x - 1, reader, bounds, chunkCache);
-									double b = GetBlockHeight(chunk, z - 1, x, reader, bounds, chunkCache);
-									double c = GetBlockHeight(chunk, z - 1, x + 1, reader, bounds, chunkCache);
-									double d = GetBlockHeight(chunk, z, x - 1, reader, bounds, chunkCache);
-									double e = GetBlockHeight(chunk, z, x, reader, bounds, chunkCache);
-									double f = GetBlockHeight(chunk, z, x + 1, reader, bounds, chunkCache);
-									double g = GetBlockHeight(chunk, z + 1, x - 1, reader, bounds, chunkCache);
-									double h = GetBlockHeight(chunk, z + 1, x, reader, bounds, chunkCache);
-									double i = GetBlockHeight(chunk, z + 1, x + 1, reader, bounds, chunkCache);
+									double a = GetBlockHeight(chunk, z - 1, x - 1, reader);
+									double b = GetBlockHeight(chunk, z - 1, x, reader);
+									double c = GetBlockHeight(chunk, z - 1, x + 1, reader);
+									double d = GetBlockHeight(chunk, z, x - 1, reader);
+									double e = GetBlockHeight(chunk, z, x, reader);
+									double f = GetBlockHeight(chunk, z, x + 1, reader);
+									double g = GetBlockHeight(chunk, z + 1, x - 1, reader);
+									double h = GetBlockHeight(chunk, z + 1, x, reader);
+									double i = GetBlockHeight(chunk, z + 1, x + 1, reader);
 
 									// compute hillshade
 									const int cellsize = 4; // no idea what this is...
@@ -132,49 +126,41 @@ namespace MCSharp.ConsoleApp
 			Console.WriteLine("Total time: {0}", stopwatch.ElapsedMilliseconds);
 		}
 
-		private static ChunkData GetChunk(WorldReader reader, GameSaveBounds bounds, int chunkX, int chunkZ, ConcurrentDictionary<int, ChunkData> cache)
+		private static ChunkData GetChunk(WorldReader reader, int chunkX, int chunkZ)
 		{
-			int cacheOffset = (chunkX - bounds.MinXChunk) + (chunkZ - bounds.MinZChunk) * bounds.ChunkWidth;
-
-			ChunkData chunk;
-			if (cache.TryGetValue(cacheOffset, out chunk))
-				return chunk;
-
 			var task = reader.GetChunkForChunkCoordinateAsync(chunkX, chunkZ);
 			task.Wait();
-			chunk = task.Result;
-			cache[cacheOffset] = chunk;
-			return chunk;
+			return task.Result;
 		}
 
-		private static double GetBlockHeight(ChunkData chunk, int blockZ, int blockX, WorldReader reader, GameSaveBounds bounds, ConcurrentDictionary<int, ChunkData> cache)
+		private static double GetBlockHeight(ChunkData chunk, int blockZ, int blockX, WorldReader reader)
 		{
 			// load correct chunk
 			if (blockZ < 0)
 			{
 				if (blockX < 0)
-					chunk = GetChunk(reader, bounds, chunk.XPosition.Value - 1, chunk.ZPosition.Value - 1, cache);
+					chunk = GetChunk(reader, chunk.XPosition.Value - 1, chunk.ZPosition.Value - 1);
 				else if (blockX >= Constants.ChunkBlockWidth)
-					chunk = GetChunk(reader, bounds, chunk.XPosition.Value + 1, chunk.ZPosition.Value - 1, cache);
+					chunk = GetChunk(reader, chunk.XPosition.Value + 1, chunk.ZPosition.Value - 1);
 				else
-					chunk = GetChunk(reader, bounds, chunk.XPosition.Value, chunk.ZPosition.Value - 1, cache);
+					chunk = GetChunk(reader, chunk.XPosition.Value, chunk.ZPosition.Value - 1);
 			}
 			else if (blockZ >= Constants.ChunkBlockWidth)
 			{
 				if (blockX < 0)
-					chunk = GetChunk(reader, bounds, chunk.XPosition.Value - 1, chunk.ZPosition.Value + 1, cache);
+					chunk = GetChunk(reader, chunk.XPosition.Value - 1, chunk.ZPosition.Value + 1);
 				else if (blockX >= Constants.ChunkBlockWidth)
-					chunk = GetChunk(reader, bounds, chunk.XPosition.Value + 1, chunk.ZPosition.Value + 1, cache);
+					chunk = GetChunk(reader, chunk.XPosition.Value + 1, chunk.ZPosition.Value + 1);
 				else
-					chunk = GetChunk(reader, bounds, chunk.XPosition.Value, chunk.ZPosition.Value + 1, cache);
+					chunk = GetChunk(reader, chunk.XPosition.Value, chunk.ZPosition.Value + 1);
 			}
 			else if (blockX < 0)
 			{
-				chunk = GetChunk(reader, bounds, chunk.XPosition.Value - 1, chunk.ZPosition.Value, cache);
+				chunk = GetChunk(reader, chunk.XPosition.Value - 1, chunk.ZPosition.Value);
 			}
 			else if (blockX >= Constants.ChunkBlockWidth)
 			{
-				chunk = GetChunk(reader, bounds, chunk.XPosition.Value + 1, chunk.ZPosition.Value, cache);
+				chunk = GetChunk(reader, chunk.XPosition.Value + 1, chunk.ZPosition.Value);
 			}
 
 			// adjust block
