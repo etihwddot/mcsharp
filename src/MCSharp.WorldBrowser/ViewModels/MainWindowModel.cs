@@ -23,6 +23,13 @@ namespace MCSharp.WorldBrowser.ViewModels
 			m_log = new StringBuilder();
 			m_availableSaves = GameSaveInfo.GetAvailableSaves().ToList().AsReadOnly();
 			SelectedSave = m_availableSaves.FirstOrDefault();
+			
+			m_availableRenderers = new List<IRenderer>
+			{
+				new BasicBiomeRenderer(),
+				new HillshadeRenderer(),
+			}.AsReadOnly();
+			SelectedRenderer = m_availableRenderers.FirstOrDefault();
 		}
 
 		public ReadOnlyCollection<GameSaveInfo> AvailableSaves
@@ -45,6 +52,31 @@ namespace MCSharp.WorldBrowser.ViewModels
 				{
 					m_selectedSave = value;
 					RaisePropertyChanged(SelectedSaveProperty);
+					GenerateImage();
+				}
+			}
+		}
+
+		public ReadOnlyCollection<IRenderer> AvailableRenderers
+		{
+			get { return m_availableRenderers; }
+		}
+
+		public static readonly string SelectedRendererProperty = ExpressionUtility.GetPropertyName((MainWindowModel x) => x.SelectedRenderer);
+		public IRenderer SelectedRenderer
+		{
+			get
+			{
+				VerifyAccess();
+				return m_selectedRenderer;
+			}
+			set
+			{
+				VerifyAccess();
+				if (value != m_selectedRenderer)
+				{
+					m_selectedRenderer = value;
+					RaisePropertyChanged(SelectedRendererProperty);
 					GenerateImage();
 				}
 			}
@@ -85,7 +117,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		private void GenerateImage()
 		{
-			if (m_selectedSave == null)
+			if (m_selectedSave == null || m_selectedRenderer == null)
 				return;
 
 			// cancel existing work
@@ -109,17 +141,17 @@ namespace MCSharp.WorldBrowser.ViewModels
 			WriteLine("Loading: {0}", m_selectedSave.Name);
 			WorldSave save = await WorldSave.LoadAsync(m_selectedSave);
 
-			BasicBiomeRenderer renderer = new BasicBiomeRenderer(save);
+			PixelSize size = await m_selectedRenderer.GetRenderSizeAsync(save, token);
 
-			m_image = new WriteableBitmap(renderer.PixelWidth, renderer.PixelHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
+			m_image = new WriteableBitmap(size.Width, size.Height, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
-			await renderer.RenderAsync(this, token);
+			await m_selectedRenderer.RenderAsync(save, this, token);
 
 			WriteLine("Total time: {0}", stopwatch.Elapsed);
 		}
 
-		private void WritePixels(int x, int y, int width, int height, ColorBgra32[] pixels)
+		public void WritePixels(int x, int y, int width, int height, ColorBgra32[] pixels)
 		{
 			if (m_image == null)
 				return;
@@ -142,7 +174,9 @@ namespace MCSharp.WorldBrowser.ViewModels
 		CancellationTokenSource m_source;
 		GameSaveInfo m_selectedSave;
 		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
+		ReadOnlyCollection<IRenderer> m_availableRenderers;
 		WriteableBitmap m_image;
 		Task m_imageTask;
+		private IRenderer m_selectedRenderer;
 	}
 }

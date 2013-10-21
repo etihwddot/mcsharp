@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mcs="clr-namespace:MCSharp;assembly=MCSharp"
 	xmlns:view="clr-namespace:MCSharp.WorldBrowser.Views"
+	xmlns:vm="clr-namespace:MCSharp.WorldBrowser.ViewModels"
     Title="World Browser"
 	FontSize="12pt"
 	Height="800"
@@ -19,6 +20,11 @@
 					</Span>
 				</TextBlock>
 			</StackPanel>
+		</DataTemplate>
+
+		<!-- Since interfaces are not supported well in DataTypes use a named template-->
+		<DataTemplate x:Key="RendererTemplate">
+			<TextBlock Text="{Binding Title}" />
 		</DataTemplate>
 	</Window.Resources>
 	
@@ -37,12 +43,22 @@
 			<StackPanel>
 				<TextBlock
 					Text="Save:"
-					Margin="0,0,4,0" />
+					Margin="0,4" />
 				<ComboBox
 					HorizontalAlignment="Left"
 					Width="300"
 					SelectedItem="{Binding SelectedSave}"
 					ItemsSource="{Binding AvailableSaves}" />
+
+				<TextBlock
+					Text="Renderer:"
+					Margin="0,4" />
+				<ComboBox
+					HorizontalAlignment="Left"
+					Width="300"
+					ItemTemplate="{StaticResource RendererTemplate}"
+					SelectedItem="{Binding SelectedRenderer}"
+					ItemsSource="{Binding AvailableRenderers}" />
 			</StackPanel>
 
 			<ScrollViewer

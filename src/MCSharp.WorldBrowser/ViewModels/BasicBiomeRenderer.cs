@@ -8,27 +8,32 @@ using MCSharp.Utility;
 
 namespace MCSharp.WorldBrowser.ViewModels
 {
-	public sealed class BasicBiomeRenderer
+	public sealed class BasicBiomeRenderer : IRenderer
 	{
-		public BasicBiomeRenderer(WorldSave save)
+		public string Title
 		{
-			m_save = save;
+			get { return "Basic Biome"; }
 		}
 
-		internal async Task RenderAsync(IRenderTarget target, CancellationToken token)
+		public string Name
 		{
-			TransformBlock<RegionInfo, Tuple<IRenderTarget, RegionInfo, ColorBgra32[]>> regionToBytesTransform = new TransformBlock<RegionInfo, Tuple<IRenderTarget, RegionInfo, ColorBgra32[]>>(x =>
+			get { return "biome"; }
+		}
+
+		public async Task RenderAsync(WorldSave save, IRenderTarget target, CancellationToken token)
+		{
+			TransformBlock<RegionInfo, Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>> regionToBytesTransform = new TransformBlock<RegionInfo, Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>>(x =>
 			{
 				ColorBgra32[] pixels = GetRegionPixels(x);
-				return Tuple.Create(target, x, pixels);
+				return Tuple.Create(target, save, x, pixels);
 			}, new ExecutionDataflowBlockOptions { CancellationToken = token, MaxDegreeOfParallelism = 4 });
 
-			ActionBlock<Tuple<IRenderTarget, RegionInfo, ColorBgra32[]>> renderRegionAction = new ActionBlock<Tuple<IRenderTarget, RegionInfo, ColorBgra32[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
-				new ExecutionDataflowBlockOptions { CancellationToken = token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
+			ActionBlock<Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>> renderRegionAction = new ActionBlock<Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>>(
+				x => RenderRegion(x.Item1, x.Item2, x.Item3, x.Item4), new ExecutionDataflowBlockOptions { CancellationToken = token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
 
 			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
 			
-			foreach (var region in m_save.Regions)
+			foreach (var region in save.Regions)
 				regionToBytesTransform.Post(region);
 			regionToBytesTransform.Complete();
 
@@ -41,10 +46,10 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 		}
 
-		private void RenderRegion(IRenderTarget target, RegionInfo region, ColorBgra32[] pixels)
+		private void RenderRegion(IRenderTarget target, WorldSave save, RegionInfo region, ColorBgra32[] pixels)
 		{
-			int regionXBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.X - m_save.Bounds.X);
-			int regionZBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z - m_save.Bounds.Z);
+			int regionXBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.X - save.Bounds.X);
+			int regionZBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z - save.Bounds.Z);
 
 			int blockWidth = LengthUtility.RegionsToBlocks(region.Bounds.Width);
 
@@ -97,16 +102,9 @@ namespace MCSharp.WorldBrowser.ViewModels
 			return bytes;
 		}
 
-		public int PixelWidth
+		public Task<PixelSize> GetRenderSizeAsync(WorldSave save, CancellationToken token)
 		{
-			get { return LengthUtility.RegionsToBlocks(m_save.Bounds.Width); }
+			return Task.Run(() => new PixelSize(LengthUtility.RegionsToBlocks(save.Bounds.Width), LengthUtility.RegionsToBlocks(save.Bounds.Height)));
 		}
-
-		public int PixelHeight
-		{
-			get { return LengthUtility.RegionsToBlocks(m_save.Bounds.Height); }
-		}
-
-		readonly WorldSave m_save;
 	}
 }
