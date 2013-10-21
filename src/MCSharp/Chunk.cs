@@ -6,16 +6,16 @@ using MCSharp.NamedBinaryTag;
 
 namespace MCSharp
 {
-	public sealed class ChunkData
+	public sealed class Chunk
 	{
-		public static ChunkData Create(ChunkInfo info, NbtCompound root)
+		public static Chunk Create(ChunkInfo info, NbtCompound root)
 		{
-			var chunk = new ChunkData(info, root);
+			var chunk = new Chunk(info, root);
 			chunk.Initialize();
 			return chunk;
 		}
 
-		private ChunkData(ChunkInfo info, NbtCompound root)
+		private Chunk(ChunkInfo info, NbtCompound root)
 		{
 			m_info = info;
 			m_root = root;

@@ -140,11 +140,11 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		private static byte[] GetRegionBytes(RegionFile region)
 		{
-			IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
+			IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
 			Byte[] bytes = new Byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
 
-			foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
+			foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 			{
 				int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
 				int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;

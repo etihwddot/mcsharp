@@ -22,7 +22,7 @@ namespace MCSharp
 			m_regionsPath = regionsPath;
 		}
 
-		public static IEnumerable<ChunkData> LoadChunksInRegion(RegionFile regionFile)
+		public static IEnumerable<Chunk> LoadChunksInRegion(RegionFile regionFile)
 		{
 			using (Stream stream = File.OpenRead(regionFile.Location))
 			using (BinaryReader reader = new BinaryReader(stream))
@@ -38,7 +38,7 @@ namespace MCSharp
 					// return empty chunks
 					if (!chunk.ChunkExists)
 					{
-						yield return ChunkData.Create(chunk, null);
+						yield return Chunk.Create(chunk, null);
 						continue;
 					}
 
@@ -61,7 +61,7 @@ namespace MCSharp
 							throw new InvalidOperationException();
 					}
 
-					yield return ChunkData.Create(chunk, root);
+					yield return Chunk.Create(chunk, root);
 				}
 			}
 		}

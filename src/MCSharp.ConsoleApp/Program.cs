@@ -37,7 +37,7 @@ namespace MCSharp.ConsoleApp
 
 			save.Regions.AsParallel().ForAll(region =>
 			{
-				foreach (ChunkData chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
+				foreach (Chunk chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
 				{
 					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.X);
 					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
@@ -55,10 +55,10 @@ namespace MCSharp.ConsoleApp
 				{
 					string regionFileName = Path.GetFileName(region.Location);
 
-					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
+					IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
 
-					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
+					foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
 						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.X);
 						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.Z);

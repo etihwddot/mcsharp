@@ -49,7 +49,7 @@
     <Compile Include="BinaryReaderUtility.cs" />
     <Compile Include="BiomeKind.cs" />
     <Compile Include="NamedBinaryTag\NbtCompressionType.cs" />
-    <Compile Include="ChunkData.cs" />
+    <Compile Include="Chunk.cs" />
     <Compile Include="ChunkInfo.cs" />
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
