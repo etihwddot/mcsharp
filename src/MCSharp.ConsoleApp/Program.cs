@@ -18,7 +18,7 @@ namespace MCSharp.ConsoleApp
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 
 			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
-			//GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
+			// GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
 			{
 				Console.WriteLine("Unable to load save.");
@@ -30,14 +30,14 @@ namespace MCSharp.ConsoleApp
 			int? originXOffset = null;
 			int? originZOffset = null;
 
-			int[,] heightMap = new int[save.Bounds.BlockHeight, save.Bounds.BlockWidth];
+			int[,] heightMap = new int[LengthUtility.RegionsToBlocks(save.Bounds.Height), LengthUtility.RegionsToBlocks(save.Bounds.Width)];
 
 			save.Regions.AsParallel().ForAll(region =>
 			{
 				foreach (ChunkData chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
 				{
-					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
-					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
+					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.X);
+					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
 					for (int z = 0; z < Constants.ChunkBlockWidth; z++)
 						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
@@ -45,7 +45,7 @@ namespace MCSharp.ConsoleApp
 				}
 			});
 			
-			Bitmap bitmap = new Bitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight);
+			Bitmap bitmap = new Bitmap(LengthUtility.RegionsToBlocks(save.Bounds.Width), LengthUtility.RegionsToBlocks(save.Bounds.Height));
 			using (LockedBitmapWriter bitmapWriter = new LockedBitmapWriter(bitmap))
 			{
 				save.Regions.AsParallel().ForAll(region =>
@@ -57,8 +57,8 @@ namespace MCSharp.ConsoleApp
 
 					foreach (ChunkData chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinXBlock;
-						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - save.Bounds.MinZBlock;
+						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.X);
+						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
 
 						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
@@ -71,8 +71,8 @@ namespace MCSharp.ConsoleApp
 								BiomeKind biome = chunk.GetBiome(x, z);
 
 								double hillshade = 0;
-								if (imageX > 0 && imageX < save.Bounds.BlockWidth - 1 &&
-									imageY > 0 && imageY < save.Bounds.BlockHeight - 1)
+								if (imageX > 0 && imageX < LengthUtility.RegionsToBlocks(save.Bounds.Width) - 1 &&
+									imageY > 0 && imageY < LengthUtility.RegionsToBlocks(save.Bounds.Height) - 1)
 								{
 									double a = heightMap[imageY - 1, imageX - 1];
 									double b = heightMap[imageY - 1, imageX];

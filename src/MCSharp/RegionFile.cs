@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using MCSharp.Utility;
 
 namespace MCSharp
 {
@@ -10,8 +11,9 @@ namespace MCSharp
 
 			string regionFileName = Path.GetFileName(fileName);
 			string[] regionFileNameParts = regionFileName.Split('.');
-			m_x = int.Parse(regionFileNameParts[1]);
-			m_z = int.Parse(regionFileNameParts[2]);
+			int x = int.Parse(regionFileNameParts[1]);
+			int z = int.Parse(regionFileNameParts[2]);
+			m_bounds = new Bounds(x, z, 1, 1);
 		}
 
 		public string FileName
@@ -19,18 +21,12 @@ namespace MCSharp
 			get { return m_fileName; }
 		}
 
-		public int RegionX
+		public Bounds Bounds
 		{
-			get { return m_x; }
-		}
-
-		public int RegionZ
-		{
-			get { return m_z; }
+			get { return m_bounds; }
 		}
 
 		readonly string m_fileName;
-		readonly int m_x;
-		readonly int m_z;
+		readonly Bounds m_bounds;
 	}
 }

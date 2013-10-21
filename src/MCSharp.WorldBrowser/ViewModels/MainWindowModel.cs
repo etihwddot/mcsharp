@@ -78,7 +78,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 		}
 
-		private async void GenerateImage()
+		private void GenerateImage()
 		{
 			if (m_selectedSave == null)
 				return;
@@ -87,12 +87,19 @@ namespace MCSharp.WorldBrowser.ViewModels
 			if (m_source != null)
 				m_source.Cancel();
 
-			Stopwatch stopwatch = Stopwatch.StartNew();
-			
-			m_source = new CancellationTokenSource();
+			// TODO: determine if something like this is necessary
+			if (m_imageTask != null && m_imageTask.Status == TaskStatus.Running)
+				m_imageTask.Wait();
 
+			m_source = new CancellationTokenSource();
+			m_imageTask = DoGenerateImage(m_source.Token);
+		}
+
+		private async Task DoGenerateImage(CancellationToken token)
+		{
 			GameSave save = GameSave.Load(m_selectedSave);
 
+			Stopwatch stopwatch = Stopwatch.StartNew();
 			TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>> regionToBytesTransform = new TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>>(x =>
 			{
 				byte[] bytes = GetRegionBytes(x);
@@ -104,7 +111,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
 
-			m_image = new WriteableBitmap(save.Bounds.BlockWidth, save.Bounds.BlockHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
+			m_image = new WriteableBitmap(LengthUtility.RegionsToBlocks(save.Bounds.Width), LengthUtility.RegionsToBlocks(save.Bounds.Height), c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
 			foreach (var region in save.Regions)
@@ -119,18 +126,16 @@ namespace MCSharp.WorldBrowser.ViewModels
 			{
 			}
 
-			// update status to say we're done
 			Elapsed = stopwatch.Elapsed;
 		}
 
 		private void RenderRegion(GameSave save, RegionFile region, byte[] bytes)
 		{
-			int regionXOffset = region.RegionX*Constants.RegionBlockWidth - save.Bounds.MinXBlock;
-			int regionZOffset = region.RegionZ*Constants.RegionBlockWidth - save.Bounds.MinZBlock;
+			int regionXOffset = region.Bounds.X * Constants.RegionBlockWidth - LengthUtility.RegionsToBlocks(save.Bounds.X);
+			int regionZOffset = region.Bounds.Z * Constants.RegionBlockWidth - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
-			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth,
-			                                     Constants.RegionBlockWidth);
-			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth*s_bytesPerPixel, 0);
+			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
+			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
 		}
 
 		private static byte[] GetRegionBytes(RegionFile region)
@@ -188,5 +193,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
 		WriteableBitmap m_image;
 		TimeSpan m_elapsed;
+		Task m_imageTask;
 	}
 }

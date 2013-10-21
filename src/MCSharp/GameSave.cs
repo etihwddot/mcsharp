@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using MCSharp.Utility;
 
 namespace MCSharp
 {
@@ -15,15 +16,18 @@ namespace MCSharp
 				.Select(x => new RegionFile(x))
 				.ToList().AsReadOnly();
 
-			// calculate region
-			GameSaveBounds bounds = new GameSaveBounds(int.MaxValue, int.MinValue, int.MinValue, int.MaxValue);
+			// calculate bounds
+			Bounds bounds = null;
+			foreach (RegionFile region in regions)
+			{
+				if (bounds == null)
+				{
+					bounds = region.Bounds;
+					continue;
+				}
 
-			bounds = regions.Aggregate(bounds,
-				(acc, r) => new GameSaveBounds(
-					Math.Min(acc.MinZ, r.RegionZ),
-					Math.Max(acc.MaxX, r.RegionX),
-					Math.Max(acc.MaxZ, r.RegionZ),
-					Math.Min(acc.MinX, r.RegionX)));
+				bounds = bounds.Union(region.Bounds);
+			}
 						
 			return new GameSave(regions, bounds);
 		}
@@ -33,12 +37,12 @@ namespace MCSharp
 			get { return m_regions; }
 		}
 
-		public GameSaveBounds Bounds
+		public Bounds Bounds
 		{
 			get { return m_bounds; }
 		}
 
-		private GameSave(ReadOnlyCollection<RegionFile> regions, GameSaveBounds bounds)
+		private GameSave(ReadOnlyCollection<RegionFile> regions, Bounds bounds)
 		{
 			m_bounds = bounds;
 			m_regions = regions;
@@ -47,7 +51,7 @@ namespace MCSharp
 		const string c_regionFolderName = "region";
 		const string c_regionExtension = "*.mca";
 
-		GameSaveBounds m_bounds;
+		Bounds m_bounds;
 		ReadOnlyCollection<RegionFile> m_regions;
 	}
 }
