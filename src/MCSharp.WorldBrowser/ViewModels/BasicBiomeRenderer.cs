@@ -62,13 +62,10 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			int regionBlockWidth = LengthUtility.RegionsToBlocks(1);
 
-			ColorBgra32[] bytes = new ColorBgra32[regionBlockWidth * regionBlockWidth];
+			ColorBgra32[] pixels = new ColorBgra32[regionBlockWidth * regionBlockWidth];
 
 			foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 			{
-				int xOffset = LengthUtility.ChunksToBlocks(chunk.Info.ChunkX);
-				int zOffset = LengthUtility.ChunksToBlocks(chunk.Info.ChunkZ);
-
 				// Stop if canceled in middle of chunk processing
 				//token.ThrowIfCancellationRequested();
 
@@ -91,15 +88,15 @@ namespace MCSharp.WorldBrowser.ViewModels
 						if (lastHeight.HasValue && height < lastHeight)
 							color = ColorBgra32.Blend(color, ColorBgra32.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-						int pixelStart = (x + xOffset + ((z + zOffset) * regionBlockWidth));
-						bytes[pixelStart] = color;
+						int pixelStart = (x + chunk.Info.X + ((z + chunk.Info.Z) * regionBlockWidth));
+						pixels[pixelStart] = color;
 
 						lastHeight = height;
 					}
 				}
 			}
 
-			return bytes;
+			return pixels;
 		}
 
 		public Task<PixelSize> GetRenderSizeAsync(WorldSave save, CancellationToken token)
