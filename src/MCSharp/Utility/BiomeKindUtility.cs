@@ -4,7 +4,7 @@ namespace MCSharp.Utility
 {
 	public static class BiomeKindUtility
 	{
-		public static Color32 GetColor(BiomeKind biome)
+		public static ColorBgra32 GetColor(BiomeKind biome)
 		{
 			switch (biome)
 			{
@@ -28,10 +28,10 @@ namespace MCSharp.Utility
 				return s_random.Next(11) < 10 ? NamedColors.DarkGray : NamedColors.ForestGreen;
 
 			case BiomeKind.Swampland: return NamedColors.DarkOliveGreen;
-			case BiomeKind.Jungle: return Color32.FromRgb(0x0D, 0x35, 0x01);
-			case BiomeKind.JungleHills: return Color32.FromRgb(0x0D, 0x35, 0x01);
-			case BiomeKind.Desert: return Color32.FromRgb(0xDB, 0xD3, 0xA0);
-			case BiomeKind.DesertHills: return Color32.FromRgb(0xDB, 0xD3, 0xA0);
+			case BiomeKind.Jungle: return ColorBgra32.FromRgb(0x0D, 0x35, 0x01);
+			case BiomeKind.JungleHills: return ColorBgra32.FromRgb(0x0D, 0x35, 0x01);
+			case BiomeKind.Desert: return ColorBgra32.FromRgb(0xDB, 0xD3, 0xA0);
+			case BiomeKind.DesertHills: return ColorBgra32.FromRgb(0xDB, 0xD3, 0xA0);
 			case BiomeKind.ColdTaiga: return NamedColors.White;
 			case BiomeKind.ColdTaigaHills: return NamedColors.WhiteSmoke;
 			case BiomeKind.Taiga: return NamedColors.ForestGreen;

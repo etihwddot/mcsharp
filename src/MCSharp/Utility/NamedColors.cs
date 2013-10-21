@@ -2,709 +2,709 @@
 {
 	public static class NamedColors
 	{
-		public static Color32 AliceBlue
+		public static ColorBgra32 AliceBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0xF0, 0xF8, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF0, 0xF8, 0xFF); }
 		}
 
-		public static Color32 AntiqueWhite
+		public static ColorBgra32 AntiqueWhite
 		{
-			get { return Color32.FromArgb(0xFF, 0xFA, 0xEB, 0xD7); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFA, 0xEB, 0xD7); }
 		}
 
-		public static Color32 Aqua
+		public static ColorBgra32 Aqua
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xFF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xFF, 0xFF); }
 		}
 
-		public static Color32 Aquamarine
+		public static ColorBgra32 Aquamarine
 		{
-			get { return Color32.FromArgb(0xFF, 0x7F, 0xFF, 0xD4); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x7F, 0xFF, 0xD4); }
 		}
 
-		public static Color32 Azure
+		public static ColorBgra32 Azure
 		{
-			get { return Color32.FromArgb(0xFF, 0xF0, 0xFF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF0, 0xFF, 0xFF); }
 		}
 
-		public static Color32 Beige
+		public static ColorBgra32 Beige
 		{
-			get { return Color32.FromArgb(0xFF, 0xF5, 0xF5, 0xDC); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF5, 0xF5, 0xDC); }
 		}
 
-		public static Color32 Bisque
+		public static ColorBgra32 Bisque
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xE4, 0xC4); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xE4, 0xC4); }
 		}
 
-		public static Color32 Black
+		public static ColorBgra32 Black
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x0, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x0, 0x0); }
 		}
 
-		public static Color32 BlanchedAlmond
+		public static ColorBgra32 BlanchedAlmond
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xEB, 0xCD); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xEB, 0xCD); }
 		}
 
-		public static Color32 Blue
+		public static ColorBgra32 Blue
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x0, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x0, 0xFF); }
 		}
 
-		public static Color32 BlueViolet
+		public static ColorBgra32 BlueViolet
 		{
-			get { return Color32.FromArgb(0xFF, 0x8A, 0x2B, 0xE2); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x8A, 0x2B, 0xE2); }
 		}
 
-		public static Color32 Brown
+		public static ColorBgra32 Brown
 		{
-			get { return Color32.FromArgb(0xFF, 0xA5, 0x2A, 0x2A); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xA5, 0x2A, 0x2A); }
 		}
 
-		public static Color32 BurlyWood
+		public static ColorBgra32 BurlyWood
 		{
-			get { return Color32.FromArgb(0xFF, 0xDE, 0xB8, 0x87); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDE, 0xB8, 0x87); }
 		}
 
-		public static Color32 CadetBlue
+		public static ColorBgra32 CadetBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x5F, 0x9E, 0xA0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x5F, 0x9E, 0xA0); }
 		}
 
-		public static Color32 Chartreuse
+		public static ColorBgra32 Chartreuse
 		{
-			get { return Color32.FromArgb(0xFF, 0x7F, 0xFF, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x7F, 0xFF, 0x0); }
 		}
 
-		public static Color32 Chocolate
+		public static ColorBgra32 Chocolate
 		{
-			get { return Color32.FromArgb(0xFF, 0xD2, 0x69, 0x1E); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xD2, 0x69, 0x1E); }
 		}
 
-		public static Color32 Coral
+		public static ColorBgra32 Coral
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x7F, 0x50); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x7F, 0x50); }
 		}
 
-		public static Color32 CornflowerBlue
+		public static ColorBgra32 CornflowerBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x64, 0x95, 0xED); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x64, 0x95, 0xED); }
 		}
 
-		public static Color32 Cornsilk
+		public static ColorBgra32 Cornsilk
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xF8, 0xDC); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xF8, 0xDC); }
 		}
 
-		public static Color32 Crimson
+		public static ColorBgra32 Crimson
 		{
-			get { return Color32.FromArgb(0xFF, 0xDC, 0x14, 0x3C); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDC, 0x14, 0x3C); }
 		}
 
-		public static Color32 Cyan
+		public static ColorBgra32 Cyan
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xFF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xFF, 0xFF); }
 		}
 
-		public static Color32 DarkBlue
+		public static ColorBgra32 DarkBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x0, 0x8B); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x0, 0x8B); }
 		}
 
-		public static Color32 DarkCyan
+		public static ColorBgra32 DarkCyan
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x8B, 0x8B); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x8B, 0x8B); }
 		}
 
-		public static Color32 DarkGoldenrod
+		public static ColorBgra32 DarkGoldenrod
 		{
-			get { return Color32.FromArgb(0xFF, 0xB8, 0x86, 0xB); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xB8, 0x86, 0xB); }
 		}
 
-		public static Color32 DarkGray
+		public static ColorBgra32 DarkGray
 		{
-			get { return Color32.FromArgb(0xFF, 0xA9, 0xA9, 0xA9); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xA9, 0xA9, 0xA9); }
 		}
 
-		public static Color32 DarkGreen
+		public static ColorBgra32 DarkGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x64, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x64, 0x0); }
 		}
 
-		public static Color32 DarkKhaki
+		public static ColorBgra32 DarkKhaki
 		{
-			get { return Color32.FromArgb(0xFF, 0xBD, 0xB7, 0x6B); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xBD, 0xB7, 0x6B); }
 		}
 
-		public static Color32 DarkMagenta
+		public static ColorBgra32 DarkMagenta
 		{
-			get { return Color32.FromArgb(0xFF, 0x8B, 0x0, 0x8B); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x8B, 0x0, 0x8B); }
 		}
 
-		public static Color32 DarkOliveGreen
+		public static ColorBgra32 DarkOliveGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x55, 0x6B, 0x2F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x55, 0x6B, 0x2F); }
 		}
 
-		public static Color32 DarkOrange
+		public static ColorBgra32 DarkOrange
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x8C, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x8C, 0x0); }
 		}
 
-		public static Color32 DarkOrchid
+		public static ColorBgra32 DarkOrchid
 		{
-			get { return Color32.FromArgb(0xFF, 0x99, 0x32, 0xCC); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x99, 0x32, 0xCC); }
 		}
 
-		public static Color32 DarkRed
+		public static ColorBgra32 DarkRed
 		{
-			get { return Color32.FromArgb(0xFF, 0x8B, 0x0, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x8B, 0x0, 0x0); }
 		}
 
-		public static Color32 DarkSalmon
+		public static ColorBgra32 DarkSalmon
 		{
-			get { return Color32.FromArgb(0xFF, 0xE9, 0x96, 0x7A); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xE9, 0x96, 0x7A); }
 		}
 
-		public static Color32 DarkSeaGreen
+		public static ColorBgra32 DarkSeaGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x8F, 0xBC, 0x8F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x8F, 0xBC, 0x8F); }
 		}
 
-		public static Color32 DarkSlateBlue
+		public static ColorBgra32 DarkSlateBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x48, 0x3D, 0x8B); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x48, 0x3D, 0x8B); }
 		}
 
-		public static Color32 DarkSlateGray
+		public static ColorBgra32 DarkSlateGray
 		{
-			get { return Color32.FromArgb(0xFF, 0x2F, 0x4F, 0x4F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x2F, 0x4F, 0x4F); }
 		}
 
-		public static Color32 DarkTurquoise
+		public static ColorBgra32 DarkTurquoise
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xCE, 0xD1); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xCE, 0xD1); }
 		}
 
-		public static Color32 DarkViolet
+		public static ColorBgra32 DarkViolet
 		{
-			get { return Color32.FromArgb(0xFF, 0x94, 0x0, 0xD3); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x94, 0x0, 0xD3); }
 		}
 
-		public static Color32 DeepPink
+		public static ColorBgra32 DeepPink
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x14, 0x93); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x14, 0x93); }
 		}
 
-		public static Color32 DeepSkyBlue
+		public static ColorBgra32 DeepSkyBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xBF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xBF, 0xFF); }
 		}
 
-		public static Color32 DimGray
+		public static ColorBgra32 DimGray
 		{
-			get { return Color32.FromArgb(0xFF, 0x69, 0x69, 0x69); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x69, 0x69, 0x69); }
 		}
 
-		public static Color32 DodgerBlue
+		public static ColorBgra32 DodgerBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x1E, 0x90, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x1E, 0x90, 0xFF); }
 		}
 
-		public static Color32 Firebrick
+		public static ColorBgra32 Firebrick
 		{
-			get { return Color32.FromArgb(0xFF, 0xB2, 0x22, 0x22); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xB2, 0x22, 0x22); }
 		}
 
-		public static Color32 FloralWhite
+		public static ColorBgra32 FloralWhite
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFA, 0xF0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFA, 0xF0); }
 		}
 
-		public static Color32 ForestGreen
+		public static ColorBgra32 ForestGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x22, 0x8B, 0x22); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x22, 0x8B, 0x22); }
 		}
 
-		public static Color32 Fuchsia
+		public static ColorBgra32 Fuchsia
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x0, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x0, 0xFF); }
 		}
 
-		public static Color32 Gainsboro
+		public static ColorBgra32 Gainsboro
 		{
-			get { return Color32.FromArgb(0xFF, 0xDC, 0xDC, 0xDC); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDC, 0xDC, 0xDC); }
 		}
 
-		public static Color32 GhostWhite
+		public static ColorBgra32 GhostWhite
 		{
-			get { return Color32.FromArgb(0xFF, 0xF8, 0xF8, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF8, 0xF8, 0xFF); }
 		}
 
-		public static Color32 Gold
+		public static ColorBgra32 Gold
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xD7, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xD7, 0x0); }
 		}
 
-		public static Color32 Goldenrod
+		public static ColorBgra32 Goldenrod
 		{
-			get { return Color32.FromArgb(0xFF, 0xDA, 0xA5, 0x20); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDA, 0xA5, 0x20); }
 		}
 
-		public static Color32 Gray
+		public static ColorBgra32 Gray
 		{
-			get { return Color32.FromArgb(0xFF, 0x80, 0x80, 0x80); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x80, 0x80, 0x80); }
 		}
 
-		public static Color32 Green
+		public static ColorBgra32 Green
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x80, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x80, 0x0); }
 		}
 
-		public static Color32 GreenYellow
+		public static ColorBgra32 GreenYellow
 		{
-			get { return Color32.FromArgb(0xFF, 0xAD, 0xFF, 0x2F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xAD, 0xFF, 0x2F); }
 		}
 
-		public static Color32 Honeydew
+		public static ColorBgra32 Honeydew
 		{
-			get { return Color32.FromArgb(0xFF, 0xF0, 0xFF, 0xF0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF0, 0xFF, 0xF0); }
 		}
 
-		public static Color32 HotPink
+		public static ColorBgra32 HotPink
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x69, 0xB4); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x69, 0xB4); }
 		}
 
-		public static Color32 IndianRed
+		public static ColorBgra32 IndianRed
 		{
-			get { return Color32.FromArgb(0xFF, 0xCD, 0x5C, 0x5C); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xCD, 0x5C, 0x5C); }
 		}
 
-		public static Color32 Indigo
+		public static ColorBgra32 Indigo
 		{
-			get { return Color32.FromArgb(0xFF, 0x4B, 0x0, 0x82); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x4B, 0x0, 0x82); }
 		}
 
-		public static Color32 Ivory
+		public static ColorBgra32 Ivory
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFF, 0xF0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFF, 0xF0); }
 		}
 
-		public static Color32 Khaki
+		public static ColorBgra32 Khaki
 		{
-			get { return Color32.FromArgb(0xFF, 0xF0, 0xE6, 0x8C); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF0, 0xE6, 0x8C); }
 		}
 
-		public static Color32 Lavender
+		public static ColorBgra32 Lavender
 		{
-			get { return Color32.FromArgb(0xFF, 0xE6, 0xE6, 0xFA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xE6, 0xE6, 0xFA); }
 		}
 
-		public static Color32 LavenderBlush
+		public static ColorBgra32 LavenderBlush
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xF0, 0xF5); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xF0, 0xF5); }
 		}
 
-		public static Color32 LawnGreen
+		public static ColorBgra32 LawnGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x7C, 0xFC, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x7C, 0xFC, 0x0); }
 		}
 
-		public static Color32 LemonChiffon
+		public static ColorBgra32 LemonChiffon
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFA, 0xCD); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFA, 0xCD); }
 		}
 
-		public static Color32 LightBlue
+		public static ColorBgra32 LightBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0xAD, 0xD8, 0xE6); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xAD, 0xD8, 0xE6); }
 		}
 
-		public static Color32 LightCoral
+		public static ColorBgra32 LightCoral
 		{
-			get { return Color32.FromArgb(0xFF, 0xF0, 0x80, 0x80); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF0, 0x80, 0x80); }
 		}
 
-		public static Color32 LightCyan
+		public static ColorBgra32 LightCyan
 		{
-			get { return Color32.FromArgb(0xFF, 0xE0, 0xFF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xE0, 0xFF, 0xFF); }
 		}
 
-		public static Color32 LightGoldenrodYellow
+		public static ColorBgra32 LightGoldenrodYellow
 		{
-			get { return Color32.FromArgb(0xFF, 0xFA, 0xFA, 0xD2); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFA, 0xFA, 0xD2); }
 		}
 
-		public static Color32 LightGray
+		public static ColorBgra32 LightGray
 		{
-			get { return Color32.FromArgb(0xFF, 0xD3, 0xD3, 0xD3); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xD3, 0xD3, 0xD3); }
 		}
 
-		public static Color32 LightGreen
+		public static ColorBgra32 LightGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x90, 0xEE, 0x90); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x90, 0xEE, 0x90); }
 		}
 
-		public static Color32 LightPink
+		public static ColorBgra32 LightPink
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xB6, 0xC1); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xB6, 0xC1); }
 		}
 
-		public static Color32 LightSalmon
+		public static ColorBgra32 LightSalmon
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xA0, 0x7A); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xA0, 0x7A); }
 		}
 
-		public static Color32 LightSeaGreen
+		public static ColorBgra32 LightSeaGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x20, 0xB2, 0xAA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x20, 0xB2, 0xAA); }
 		}
 
-		public static Color32 LightSkyBlue
+		public static ColorBgra32 LightSkyBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x87, 0xCE, 0xFA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x87, 0xCE, 0xFA); }
 		}
 
-		public static Color32 LightSlateGray
+		public static ColorBgra32 LightSlateGray
 		{
-			get { return Color32.FromArgb(0xFF, 0x77, 0x88, 0x99); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x77, 0x88, 0x99); }
 		}
 
-		public static Color32 LightSteelBlue
+		public static ColorBgra32 LightSteelBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0xB0, 0xC4, 0xDE); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xB0, 0xC4, 0xDE); }
 		}
 
-		public static Color32 LightYellow
+		public static ColorBgra32 LightYellow
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFF, 0xE0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFF, 0xE0); }
 		}
 
-		public static Color32 Lime
+		public static ColorBgra32 Lime
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xFF, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xFF, 0x0); }
 		}
 
-		public static Color32 LimeGreen
+		public static ColorBgra32 LimeGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x32, 0xCD, 0x32); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x32, 0xCD, 0x32); }
 		}
 
-		public static Color32 Linen
+		public static ColorBgra32 Linen
 		{
-			get { return Color32.FromArgb(0xFF, 0xFA, 0xF0, 0xE6); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFA, 0xF0, 0xE6); }
 		}
 
-		public static Color32 Magenta
+		public static ColorBgra32 Magenta
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x0, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x0, 0xFF); }
 		}
 
-		public static Color32 Maroon
+		public static ColorBgra32 Maroon
 		{
-			get { return Color32.FromArgb(0xFF, 0x80, 0x0, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x80, 0x0, 0x0); }
 		}
 
-		public static Color32 MediumAquamarine
+		public static ColorBgra32 MediumAquamarine
 		{
-			get { return Color32.FromArgb(0xFF, 0x66, 0xCD, 0xAA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x66, 0xCD, 0xAA); }
 		}
 
-		public static Color32 MediumBlue
+		public static ColorBgra32 MediumBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x0, 0xCD); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x0, 0xCD); }
 		}
 
-		public static Color32 MediumOrchid
+		public static ColorBgra32 MediumOrchid
 		{
-			get { return Color32.FromArgb(0xFF, 0xBA, 0x55, 0xD3); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xBA, 0x55, 0xD3); }
 		}
 
-		public static Color32 MediumPurple
+		public static ColorBgra32 MediumPurple
 		{
-			get { return Color32.FromArgb(0xFF, 0x93, 0x70, 0xDB); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x93, 0x70, 0xDB); }
 		}
 
-		public static Color32 MediumSeaGreen
+		public static ColorBgra32 MediumSeaGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x3C, 0xB3, 0x71); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x3C, 0xB3, 0x71); }
 		}
 
-		public static Color32 MediumSlateBlue
+		public static ColorBgra32 MediumSlateBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x7B, 0x68, 0xEE); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x7B, 0x68, 0xEE); }
 		}
 
-		public static Color32 MediumSpringGreen
+		public static ColorBgra32 MediumSpringGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xFA, 0x9A); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xFA, 0x9A); }
 		}
 
-		public static Color32 MediumTurquoise
+		public static ColorBgra32 MediumTurquoise
 		{
-			get { return Color32.FromArgb(0xFF, 0x48, 0xD1, 0xCC); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x48, 0xD1, 0xCC); }
 		}
 
-		public static Color32 MediumVioletRed
+		public static ColorBgra32 MediumVioletRed
 		{
-			get { return Color32.FromArgb(0xFF, 0xC7, 0x15, 0x85); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xC7, 0x15, 0x85); }
 		}
 
-		public static Color32 MidnightBlue
+		public static ColorBgra32 MidnightBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x19, 0x19, 0x70); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x19, 0x19, 0x70); }
 		}
 
-		public static Color32 MintCream
+		public static ColorBgra32 MintCream
 		{
-			get { return Color32.FromArgb(0xFF, 0xF5, 0xFF, 0xFA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF5, 0xFF, 0xFA); }
 		}
 
-		public static Color32 MistyRose
+		public static ColorBgra32 MistyRose
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xE4, 0xE1); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xE4, 0xE1); }
 		}
 
-		public static Color32 Moccasin
+		public static ColorBgra32 Moccasin
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xE4, 0xB5); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xE4, 0xB5); }
 		}
 
-		public static Color32 NavajoWhite
+		public static ColorBgra32 NavajoWhite
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xDE, 0xAD); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xDE, 0xAD); }
 		}
 
-		public static Color32 Navy
+		public static ColorBgra32 Navy
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x0, 0x80); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x0, 0x80); }
 		}
 
-		public static Color32 OldLace
+		public static ColorBgra32 OldLace
 		{
-			get { return Color32.FromArgb(0xFF, 0xFD, 0xF5, 0xE6); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFD, 0xF5, 0xE6); }
 		}
 
-		public static Color32 Olive
+		public static ColorBgra32 Olive
 		{
-			get { return Color32.FromArgb(0xFF, 0x80, 0x80, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x80, 0x80, 0x0); }
 		}
 
-		public static Color32 OliveDrab
+		public static ColorBgra32 OliveDrab
 		{
-			get { return Color32.FromArgb(0xFF, 0x6B, 0x8E, 0x23); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x6B, 0x8E, 0x23); }
 		}
 
-		public static Color32 Orange
+		public static ColorBgra32 Orange
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xA5, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xA5, 0x0); }
 		}
 
-		public static Color32 OrangeRed
+		public static ColorBgra32 OrangeRed
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x45, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x45, 0x0); }
 		}
 
-		public static Color32 Orchid
+		public static ColorBgra32 Orchid
 		{
-			get { return Color32.FromArgb(0xFF, 0xDA, 0x70, 0xD6); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDA, 0x70, 0xD6); }
 		}
 
-		public static Color32 PaleGoldenrod
+		public static ColorBgra32 PaleGoldenrod
 		{
-			get { return Color32.FromArgb(0xFF, 0xEE, 0xE8, 0xAA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xEE, 0xE8, 0xAA); }
 		}
 
-		public static Color32 PaleGreen
+		public static ColorBgra32 PaleGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x98, 0xFB, 0x98); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x98, 0xFB, 0x98); }
 		}
 
-		public static Color32 PaleTurquoise
+		public static ColorBgra32 PaleTurquoise
 		{
-			get { return Color32.FromArgb(0xFF, 0xAF, 0xEE, 0xEE); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xAF, 0xEE, 0xEE); }
 		}
 
-		public static Color32 PaleVioletRed
+		public static ColorBgra32 PaleVioletRed
 		{
-			get { return Color32.FromArgb(0xFF, 0xDB, 0x70, 0x93); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDB, 0x70, 0x93); }
 		}
 
-		public static Color32 PapayaWhip
+		public static ColorBgra32 PapayaWhip
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xEF, 0xD5); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xEF, 0xD5); }
 		}
 
-		public static Color32 PeachPuff
+		public static ColorBgra32 PeachPuff
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xDA, 0xB9); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xDA, 0xB9); }
 		}
 
-		public static Color32 Peru
+		public static ColorBgra32 Peru
 		{
-			get { return Color32.FromArgb(0xFF, 0xCD, 0x85, 0x3F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xCD, 0x85, 0x3F); }
 		}
 
-		public static Color32 Pink
+		public static ColorBgra32 Pink
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xC0, 0xCB); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xC0, 0xCB); }
 		}
 
-		public static Color32 Plum
+		public static ColorBgra32 Plum
 		{
-			get { return Color32.FromArgb(0xFF, 0xDD, 0xA0, 0xDD); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xDD, 0xA0, 0xDD); }
 		}
 
-		public static Color32 PowderBlue
+		public static ColorBgra32 PowderBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0xB0, 0xE0, 0xE6); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xB0, 0xE0, 0xE6); }
 		}
 
-		public static Color32 Purple
+		public static ColorBgra32 Purple
 		{
-			get { return Color32.FromArgb(0xFF, 0x80, 0x0, 0x80); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x80, 0x0, 0x80); }
 		}
 
-		public static Color32 Red
+		public static ColorBgra32 Red
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x0, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x0, 0x0); }
 		}
 
-		public static Color32 RosyBrown
+		public static ColorBgra32 RosyBrown
 		{
-			get { return Color32.FromArgb(0xFF, 0xBC, 0x8F, 0x8F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xBC, 0x8F, 0x8F); }
 		}
 
-		public static Color32 RoyalBlue
+		public static ColorBgra32 RoyalBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x41, 0x69, 0xE1); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x41, 0x69, 0xE1); }
 		}
 
-		public static Color32 SaddleBrown
+		public static ColorBgra32 SaddleBrown
 		{
-			get { return Color32.FromArgb(0xFF, 0x8B, 0x45, 0x13); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x8B, 0x45, 0x13); }
 		}
 
-		public static Color32 Salmon
+		public static ColorBgra32 Salmon
 		{
-			get { return Color32.FromArgb(0xFF, 0xFA, 0x80, 0x72); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFA, 0x80, 0x72); }
 		}
 
-		public static Color32 SandyBrown
+		public static ColorBgra32 SandyBrown
 		{
-			get { return Color32.FromArgb(0xFF, 0xF4, 0xA4, 0x60); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF4, 0xA4, 0x60); }
 		}
 
-		public static Color32 SeaGreen
+		public static ColorBgra32 SeaGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x2E, 0x8B, 0x57); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x2E, 0x8B, 0x57); }
 		}
 
-		public static Color32 SeaShell
+		public static ColorBgra32 SeaShell
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xF5, 0xEE); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xF5, 0xEE); }
 		}
 
-		public static Color32 Sienna
+		public static ColorBgra32 Sienna
 		{
-			get { return Color32.FromArgb(0xFF, 0xA0, 0x52, 0x2D); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xA0, 0x52, 0x2D); }
 		}
 
-		public static Color32 Silver
+		public static ColorBgra32 Silver
 		{
-			get { return Color32.FromArgb(0xFF, 0xC0, 0xC0, 0xC0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xC0, 0xC0, 0xC0); }
 		}
 
-		public static Color32 SkyBlue
+		public static ColorBgra32 SkyBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x87, 0xCE, 0xEB); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x87, 0xCE, 0xEB); }
 		}
 
-		public static Color32 SlateBlue
+		public static ColorBgra32 SlateBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x6A, 0x5A, 0xCD); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x6A, 0x5A, 0xCD); }
 		}
 
-		public static Color32 SlateGray
+		public static ColorBgra32 SlateGray
 		{
-			get { return Color32.FromArgb(0xFF, 0x70, 0x80, 0x90); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x70, 0x80, 0x90); }
 		}
 
-		public static Color32 Snow
+		public static ColorBgra32 Snow
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFA, 0xFA); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFA, 0xFA); }
 		}
 
-		public static Color32 SpringGreen
+		public static ColorBgra32 SpringGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0xFF, 0x7F); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0xFF, 0x7F); }
 		}
 
-		public static Color32 SteelBlue
+		public static ColorBgra32 SteelBlue
 		{
-			get { return Color32.FromArgb(0xFF, 0x46, 0x82, 0xB4); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x46, 0x82, 0xB4); }
 		}
 
-		public static Color32 Tan
+		public static ColorBgra32 Tan
 		{
-			get { return Color32.FromArgb(0xFF, 0xD2, 0xB4, 0x8C); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xD2, 0xB4, 0x8C); }
 		}
 
-		public static Color32 Teal
+		public static ColorBgra32 Teal
 		{
-			get { return Color32.FromArgb(0xFF, 0x0, 0x80, 0x80); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x0, 0x80, 0x80); }
 		}
 
-		public static Color32 Thistle
+		public static ColorBgra32 Thistle
 		{
-			get { return Color32.FromArgb(0xFF, 0xD8, 0xBF, 0xD8); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xD8, 0xBF, 0xD8); }
 		}
 
-		public static Color32 Tomato
+		public static ColorBgra32 Tomato
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0x63, 0x47); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0x63, 0x47); }
 		}
 
-		public static Color32 Transparent
+		public static ColorBgra32 Transparent
 		{
-			get { return Color32.FromArgb(0x0, 0xFF, 0xFF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0x0, 0xFF, 0xFF, 0xFF); }
 		}
 
-		public static Color32 Turquoise
+		public static ColorBgra32 Turquoise
 		{
-			get { return Color32.FromArgb(0xFF, 0x40, 0xE0, 0xD0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x40, 0xE0, 0xD0); }
 		}
 
-		public static Color32 Violet
+		public static ColorBgra32 Violet
 		{
-			get { return Color32.FromArgb(0xFF, 0xEE, 0x82, 0xEE); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xEE, 0x82, 0xEE); }
 		}
 
-		public static Color32 Wheat
+		public static ColorBgra32 Wheat
 		{
-			get { return Color32.FromArgb(0xFF, 0xF5, 0xDE, 0xB3); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF5, 0xDE, 0xB3); }
 		}
 
-		public static Color32 White
+		public static ColorBgra32 White
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFF, 0xFF); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFF, 0xFF); }
 		}
 
-		public static Color32 WhiteSmoke
+		public static ColorBgra32 WhiteSmoke
 		{
-			get { return Color32.FromArgb(0xFF, 0xF5, 0xF5, 0xF5); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xF5, 0xF5, 0xF5); }
 		}
 
-		public static Color32 Yellow
+		public static ColorBgra32 Yellow
 		{
-			get { return Color32.FromArgb(0xFF, 0xFF, 0xFF, 0x0); }
+			get { return ColorBgra32.FromArgb(0xFF, 0xFF, 0xFF, 0x0); }
 		}
 
-		public static Color32 YellowGreen
+		public static ColorBgra32 YellowGreen
 		{
-			get { return Color32.FromArgb(0xFF, 0x9A, 0xCD, 0x32); }
+			get { return ColorBgra32.FromArgb(0xFF, 0x9A, 0xCD, 0x32); }
 		}
 	}
 }

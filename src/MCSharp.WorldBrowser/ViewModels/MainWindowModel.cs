@@ -16,7 +16,7 @@ using MCSharp.Utility;
 
 namespace MCSharp.WorldBrowser.ViewModels
 {
-	public sealed class MainWindowModel : ViewModel
+	public sealed class MainWindowModel : ViewModel, IRenderTarget
 	{
 		public MainWindowModel()
 		{
@@ -109,93 +109,27 @@ namespace MCSharp.WorldBrowser.ViewModels
 			WriteLine("Loading: {0}", m_selectedSave.Name);
 			WorldSave save = await WorldSave.LoadAsync(m_selectedSave);
 
-			TransformBlock<RegionInfo, Tuple<WorldSave, RegionInfo, byte[]>> regionToBytesTransform = new TransformBlock<RegionInfo, Tuple<WorldSave, RegionInfo, byte[]>>(x =>
-			{
-				byte[] bytes = GetRegionBytes(x);
-				return Tuple.Create(save, x, bytes);
-			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, MaxDegreeOfParallelism = 4});
-			
-			ActionBlock<Tuple<WorldSave, RegionInfo, byte[]>> renderRegionAction = new ActionBlock<Tuple<WorldSave, RegionInfo, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
-				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
+			BasicBiomeRenderer renderer = new BasicBiomeRenderer(save);
 
-			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
-
-			m_image = new WriteableBitmap(LengthUtility.RegionsToBlocks(save.Bounds.Width), LengthUtility.RegionsToBlocks(save.Bounds.Height), c_imageDpi, c_imageDpi, s_pixelFormat, null);
+			m_image = new WriteableBitmap(renderer.PixelWidth, renderer.PixelHeight, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
-			foreach (var region in save.Regions)
-				regionToBytesTransform.Post(region);
-			regionToBytesTransform.Complete();
-
-			try
-			{
-				await renderRegionAction.Completion;
-			}
-			catch (OperationCanceledException)
-			{
-			}
+			await renderer.RenderAsync(this, token);
 
 			WriteLine("Total time: {0}", stopwatch.Elapsed);
 		}
 
-		private void RenderRegion(WorldSave save, RegionInfo region, byte[] bytes)
+		private void WritePixels(int x, int y, int width, int height, ColorBgra32[] pixels)
 		{
-			int regionXBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.X - save.Bounds.X);
-			int regionZBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z - save.Bounds.Z);
+			if (m_image == null)
+				return;
 
-			int blockWidth = LengthUtility.RegionsToBlocks(region.Bounds.Width);
+			if (pixels.Length != width * height)
+				throw new InvalidOperationException("The number of pixels needs to be the same as the height times width.");
 
-			Int32Rect regionRect = new Int32Rect(regionXBlockOffset, regionZBlockOffset, LengthUtility.RegionsToBlocks(region.Bounds.Width), LengthUtility.RegionsToBlocks(region.Bounds.Height));
-			m_image.WritePixels(regionRect, bytes, blockWidth * s_bytesPerPixel, 0);
-		}
-
-		private static byte[] GetRegionBytes(RegionInfo region)
-		{
-			IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
-
-			int regionBlockWidth = LengthUtility.RegionsToBlocks(1);
-
-			Byte[] bytes = new Byte[regionBlockWidth * regionBlockWidth * s_bytesPerPixel];
-
-			foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
-			{
-				int xOffset = LengthUtility.ChunksToBlocks(chunk.Info.ChunkX);
-				int zOffset = LengthUtility.ChunksToBlocks(chunk.Info.ChunkZ);
-				
-				// Stop if canceled in middle of chunk processing
-				//token.ThrowIfCancellationRequested();
-
-				int chunkBlockWidth = LengthUtility.ChunksToBlocks(1);
-
-				for (int z = 0; z < chunkBlockWidth; z++)
-				{
-					int? lastHeight = null;
-
-					for (int x = 0; x < chunkBlockWidth; x++)
-					{
-						BiomeKind biome = chunk.GetBiome(x, z);
-
-						int height = chunk.GetHeight(x, z);
-
-						Color32 color = BiomeKindUtility.GetColor(biome);
-
-						if (lastHeight.HasValue && height > lastHeight)
-							color = Color32.Blend(color, Color32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
-						if (lastHeight.HasValue && height < lastHeight)
-							color = Color32.Blend(color, Color32.FromArgb(0x50, 0x00, 0x00, 0x00));
-
-						int pixelStart = (x + xOffset + ((z + zOffset) * regionBlockWidth)) * s_bytesPerPixel;
-						bytes[pixelStart] = color.Blue;
-						bytes[pixelStart + 1] = color.Green;
-						bytes[pixelStart + 2] = color.Red;
-						bytes[pixelStart + 3] = color.Alpha;
-
-						lastHeight = height;
-					}
-				}
-			}
-
-			return bytes;
+			Int32Rect invalidArea = new Int32Rect(x, y, width, height);
+			
+			m_image.WritePixels(invalidArea, pixels, width * s_bytesPerPixel, 0);
 		}
 
 		static readonly PixelFormat s_pixelFormat = PixelFormats.Bgra32;
@@ -209,6 +143,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 		GameSaveInfo m_selectedSave;
 		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
 		WriteableBitmap m_image;
-		Task m_imageTask;		
+		Task m_imageTask;
 	}
 }

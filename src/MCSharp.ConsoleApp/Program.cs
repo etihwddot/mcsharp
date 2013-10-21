@@ -124,13 +124,13 @@ namespace MCSharp.ConsoleApp
 
 								byte hillshadeByte = (byte) hillshade;
 
-								Color32 color = BiomeKindUtility.GetColor(biome);
-								Color32 overlay = Color32.FromArgb(150, hillshadeByte, hillshadeByte, hillshadeByte);
+								ColorBgra32 color = BiomeKindUtility.GetColor(biome);
+								ColorBgra32 overlay = ColorBgra32.FromArgb(150, hillshadeByte, hillshadeByte, hillshadeByte);
 
 								if (hillshade == 180)
-									overlay = Color32.FromArgb(100, hillshadeByte, hillshadeByte, hillshadeByte);
+									overlay = ColorBgra32.FromArgb(100, hillshadeByte, hillshadeByte, hillshadeByte);
 
-								Color32 blendedColor = Color32.Blend(color, overlay);
+								ColorBgra32 blendedColor = ColorBgra32.Blend(color, overlay);
 
 								bitmapWriter.SetPixel(imageX, imageY, Color.FromArgb(blendedColor.Alpha, blendedColor.Red, blendedColor.Green, blendedColor.Blue));
 							}

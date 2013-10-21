@@ -76,7 +76,7 @@
     <Compile Include="Utility\LengthUtility.cs" />
     <Compile Include="Utility\Bounds.cs" />
     <Compile Include="Utility\BiomeKindUtility.cs" />
-    <Compile Include="Utility\Color32.cs" />
+    <Compile Include="Utility\ColorBgra32.cs" />
     <Compile Include="Utility\NamedColors.cs" />
   </ItemGroup>
   <ItemGroup>
