@@ -6,5 +6,10 @@
 		{
 			return regionSize * Constants.RegionBlockWidth;
 		}
+
+		public static int ChunksToBlocks(int chunkSize)
+		{
+			return chunkSize * Constants.ChunkBlockWidth;
+		}
 	}
 }

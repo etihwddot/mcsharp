@@ -2,7 +2,7 @@
 using System.IO;
 namespace MCSharp
 {
-	public static class Constants
+	internal static class Constants
 	{
 		/// <summary>
 		/// Total number of chunks in a region

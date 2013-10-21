@@ -131,32 +131,38 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		private void RenderRegion(WorldSave save, RegionFile region, byte[] bytes)
 		{
-			int regionXOffset = region.Bounds.X * Constants.RegionBlockWidth - LengthUtility.RegionsToBlocks(save.Bounds.X);
-			int regionZOffset = region.Bounds.Z * Constants.RegionBlockWidth - LengthUtility.RegionsToBlocks(save.Bounds.Z);
+			int regionXOffset = LengthUtility.RegionsToBlocks(region.Bounds.X) - LengthUtility.RegionsToBlocks(save.Bounds.X);
+			int regionZOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
-			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, Constants.RegionBlockWidth, Constants.RegionBlockWidth);
-			m_image.WritePixels(regionRect, bytes, Constants.RegionBlockWidth * s_bytesPerPixel, 0);
+			int blockWidth = LengthUtility.RegionsToBlocks(region.Bounds.Width);
+
+			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, LengthUtility.RegionsToBlocks(region.Bounds.Width), LengthUtility.RegionsToBlocks(region.Bounds.Height));
+			m_image.WritePixels(regionRect, bytes, blockWidth * s_bytesPerPixel, 0);
 		}
 
 		private static byte[] GetRegionBytes(RegionFile region)
 		{
 			IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
-			Byte[] bytes = new Byte[Constants.RegionBlockWidth * Constants.RegionBlockWidth * s_bytesPerPixel];
+			int regionBlockWidth = LengthUtility.RegionsToBlocks(1);
+
+			Byte[] bytes = new Byte[regionBlockWidth * regionBlockWidth * s_bytesPerPixel];
 
 			foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 			{
-				int xOffset = chunk.Info.ChunkX * Constants.ChunkBlockWidth;
-				int zOffset = chunk.Info.ChunkZ * Constants.ChunkBlockWidth;
+				int xOffset = LengthUtility.ChunksToBlocks(chunk.Info.ChunkX);
+				int zOffset = LengthUtility.ChunksToBlocks(chunk.Info.ChunkZ);
 				
 				// Stop if canceled in middle of chunk processing
 				//token.ThrowIfCancellationRequested();
 
-				for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+				int chunkBlockWidth = LengthUtility.ChunksToBlocks(1);
+
+				for (int z = 0; z < chunkBlockWidth; z++)
 				{
 					int? lastHeight = null;
-						
-					for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+
+					for (int x = 0; x < chunkBlockWidth; x++)
 					{
 						BiomeKind biome = chunk.GetBiome(x, z);
 
@@ -169,7 +175,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 						if (lastHeight.HasValue && height < lastHeight)
 							color = Color32.Blend(color, Color32.FromArgb(0x50, 0x00, 0x00, 0x00));
 
-						int pixelStart = (x + xOffset + ((z + zOffset) * Constants.RegionBlockWidth)) * s_bytesPerPixel;
+						int pixelStart = (x + xOffset + ((z + zOffset) * regionBlockWidth)) * s_bytesPerPixel;
 						bytes[pixelStart] = color.Blue;
 						bytes[pixelStart + 1] = color.Green;
 						bytes[pixelStart + 2] = color.Red;

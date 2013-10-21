@@ -39,11 +39,13 @@ namespace MCSharp.ConsoleApp
 			{
 				foreach (Chunk chunk in ChunkLoader.LoadChunksInRegion(region).Where(x => !x.IsEmpty))
 				{
-					int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.X);
-					int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
+					int xOffset = LengthUtility.ChunksToBlocks(chunk.XPosition.Value) - LengthUtility.RegionsToBlocks(save.Bounds.X);
+					int zOffset = LengthUtility.ChunksToBlocks(chunk.ZPosition.Value) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
-					for (int z = 0; z < Constants.ChunkBlockWidth; z++)
-						for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+					int chunkBlockWidth = LengthUtility.ChunksToBlocks(1);
+
+					for (int z = 0; z < chunkBlockWidth; z++)
+						for (int x = 0; x < chunkBlockWidth; x++)
 							heightMap[z + zOffset, x + xOffset] = chunk.GetHeight(x, z);
 				}
 			});
@@ -60,13 +62,14 @@ namespace MCSharp.ConsoleApp
 
 					foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 					{
-						int xOffset = (chunk.XPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.X);
-						int zOffset = (chunk.ZPosition.Value * Constants.ChunkBlockWidth) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
+						int xOffset = LengthUtility.ChunksToBlocks(chunk.XPosition.Value) - LengthUtility.RegionsToBlocks(save.Bounds.X);
+						int zOffset = LengthUtility.ChunksToBlocks(chunk.ZPosition.Value) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
+						int chunkBlockWidth = LengthUtility.ChunksToBlocks(1);
 
-						for (int z = 0; z < Constants.ChunkBlockWidth; z++)
+						for (int z = 0; z < chunkBlockWidth; z++)
 						{
-							for (int x = 0; x < Constants.ChunkBlockWidth; x++)
+							for (int x = 0; x < chunkBlockWidth; x++)
 							{
 								int imageX = x + xOffset;
 								int imageY = z + zOffset;
