@@ -4,9 +4,9 @@ using MCSharp.Utility;
 
 namespace MCSharp
 {
-	public sealed class RegionFile
+	public sealed class RegionInfo
 	{
-		public RegionFile(string location)
+		public RegionInfo(string location)
 		{
 			if (location == null)
 				throw new ArgumentNullException("location");

@@ -15,13 +15,13 @@ namespace MCSharp
 			{
 				// load regions
 				string regionFolderPath = Path.Combine(info.Location, c_regionFolderName);
-				ReadOnlyCollection<RegionFile> regions = Directory.GetFiles(regionFolderPath, c_regionExtension)
-					.Select(x => new RegionFile(x))
+				ReadOnlyCollection<RegionInfo> regions = Directory.GetFiles(regionFolderPath, c_regionExtension)
+					.Select(x => new RegionInfo(x))
 					.ToList().AsReadOnly();
 
 				// calculate bounds
 				Bounds bounds = null;
-				foreach (RegionFile region in regions)
+				foreach (RegionInfo region in regions)
 				{
 					if (bounds == null)
 					{
@@ -36,7 +36,7 @@ namespace MCSharp
 			});
 		}
 
-		public ReadOnlyCollection<RegionFile> Regions
+		public ReadOnlyCollection<RegionInfo> Regions
 		{
 			get { return m_regions; }
 		}
@@ -46,7 +46,7 @@ namespace MCSharp
 			get { return m_bounds; }
 		}
 
-		private WorldSave(ReadOnlyCollection<RegionFile> regions, Bounds bounds)
+		private WorldSave(ReadOnlyCollection<RegionInfo> regions, Bounds bounds)
 		{
 			m_bounds = bounds;
 			m_regions = regions;
@@ -56,6 +56,6 @@ namespace MCSharp
 		const string c_regionExtension = "*.mca";
 
 		Bounds m_bounds;
-		ReadOnlyCollection<RegionFile> m_regions;
+		ReadOnlyCollection<RegionInfo> m_regions;
 	}
 }

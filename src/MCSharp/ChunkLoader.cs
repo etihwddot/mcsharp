@@ -22,7 +22,7 @@ namespace MCSharp
 			m_regionsPath = regionsPath;
 		}
 
-		public static IEnumerable<Chunk> LoadChunksInRegion(RegionFile regionFile)
+		public static IEnumerable<Chunk> LoadChunksInRegion(RegionInfo regionFile)
 		{
 			using (Stream stream = File.OpenRead(regionFile.Location))
 			using (BinaryReader reader = new BinaryReader(stream))

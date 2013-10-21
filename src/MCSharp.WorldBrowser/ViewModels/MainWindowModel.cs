@@ -100,13 +100,13 @@ namespace MCSharp.WorldBrowser.ViewModels
 			WorldSave save = await WorldSave.LoadAsync(m_selectedSave);
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			TransformBlock<RegionFile, Tuple<WorldSave, RegionFile, byte[]>> regionToBytesTransform = new TransformBlock<RegionFile, Tuple<WorldSave, RegionFile, byte[]>>(x =>
+			TransformBlock<RegionInfo, Tuple<WorldSave, RegionInfo, byte[]>> regionToBytesTransform = new TransformBlock<RegionInfo, Tuple<WorldSave, RegionInfo, byte[]>>(x =>
 			{
 				byte[] bytes = GetRegionBytes(x);
 				return Tuple.Create(save, x, bytes);
 			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, MaxDegreeOfParallelism = 4});
 			
-			ActionBlock<Tuple<WorldSave, RegionFile, byte[]>> renderRegionAction = new ActionBlock<Tuple<WorldSave, RegionFile, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
+			ActionBlock<Tuple<WorldSave, RegionInfo, byte[]>> renderRegionAction = new ActionBlock<Tuple<WorldSave, RegionInfo, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
 				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
 
 			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
@@ -129,18 +129,18 @@ namespace MCSharp.WorldBrowser.ViewModels
 			Elapsed = stopwatch.Elapsed;
 		}
 
-		private void RenderRegion(WorldSave save, RegionFile region, byte[] bytes)
+		private void RenderRegion(WorldSave save, RegionInfo region, byte[] bytes)
 		{
-			int regionXOffset = LengthUtility.RegionsToBlocks(region.Bounds.X) - LengthUtility.RegionsToBlocks(save.Bounds.X);
-			int regionZOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
+			int regionXBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.X - save.Bounds.X);
+			int regionZBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z - save.Bounds.Z);
 
 			int blockWidth = LengthUtility.RegionsToBlocks(region.Bounds.Width);
 
-			Int32Rect regionRect = new Int32Rect(regionXOffset, regionZOffset, LengthUtility.RegionsToBlocks(region.Bounds.Width), LengthUtility.RegionsToBlocks(region.Bounds.Height));
+			Int32Rect regionRect = new Int32Rect(regionXBlockOffset, regionZBlockOffset, LengthUtility.RegionsToBlocks(region.Bounds.Width), LengthUtility.RegionsToBlocks(region.Bounds.Height));
 			m_image.WritePixels(regionRect, bytes, blockWidth * s_bytesPerPixel, 0);
 		}
 
-		private static byte[] GetRegionBytes(RegionFile region)
+		private static byte[] GetRegionBytes(RegionInfo region)
 		{
 			IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 

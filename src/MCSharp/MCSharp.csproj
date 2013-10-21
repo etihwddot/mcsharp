@@ -72,7 +72,7 @@
     <Compile Include="NamedBinaryTag\NbtString.cs" />
     <Compile Include="NamedBinaryTag\NbtValueBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegionFile.cs" />
+    <Compile Include="RegionInfo.cs" />
     <Compile Include="Utility\LengthUtility.cs" />
     <Compile Include="Utility\Bounds.cs" />
     <Compile Include="Utility\BiomeKindUtility.cs" />
