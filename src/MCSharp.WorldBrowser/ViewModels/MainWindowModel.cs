@@ -143,6 +143,14 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			PixelSize size = await m_selectedRenderer.GetRenderSizeAsync(save, token);
 
+			m_image = null;
+			RaisePropertyChanged(ImageProperty);
+
+			// clean up old objects
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
+
 			m_image = new WriteableBitmap(size.Width, size.Height, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
