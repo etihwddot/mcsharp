@@ -24,22 +24,34 @@
 	
     <Grid Margin="8">		
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="300" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 		
-		<StackPanel Width="300">
-			<TextBlock
-				Text="Save:"
-				Margin="0,0,4,0" />
-			<ComboBox
-				HorizontalAlignment="Left"
-				Width="300"
-				SelectedItem="{Binding SelectedSave}"
-				ItemsSource="{Binding AvailableSaves}" />
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			
+			<StackPanel>
+				<TextBlock
+					Text="Save:"
+					Margin="0,0,4,0" />
+				<ComboBox
+					HorizontalAlignment="Left"
+					Width="300"
+					SelectedItem="{Binding SelectedSave}"
+					ItemsSource="{Binding AvailableSaves}" />
+			</StackPanel>
 
-			<TextBlock Text="{Binding Elapsed}" />
-		</StackPanel>
+			<ScrollViewer
+				Grid.Row="1"
+				HorizontalScrollBarVisibility="Disabled"
+				VerticalScrollBarVisibility="Auto">
+				<TextBlock Text="{Binding Log}" TextWrapping="Wrap" />
+			</ScrollViewer>
+		</Grid>
 
 		<view:PanZoomControl Grid.Column="1">
 			<Image Source="{Binding Image}" Stretch="Uniform" />
