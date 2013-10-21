@@ -53,7 +53,7 @@
     <Compile Include="ChunkInfo.cs" />
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="GameSave.cs" />
+    <Compile Include="WorldSave.cs" />
     <Compile Include="GameSaveInfo.cs" />
     <Compile Include="NamedBinaryTag\Nbt.cs" />
     <Compile Include="NamedBinaryTag\NbtDouble.cs" />

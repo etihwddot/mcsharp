@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using MCSharp.Utility;
 
 namespace MCSharp.ConsoleApp
@@ -25,7 +26,9 @@ namespace MCSharp.ConsoleApp
 				return;
 			}
 
-			GameSave save = GameSave.Load(saveInfo);
+			Task<WorldSave> task = WorldSave.LoadAsync(saveInfo);
+			task.Wait();
+			WorldSave save = task.Result;
 
 			int? originXOffset = null;
 			int? originZOffset = null;

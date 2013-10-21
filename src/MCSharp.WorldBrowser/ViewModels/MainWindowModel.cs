@@ -97,16 +97,16 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		private async Task DoGenerateImage(CancellationToken token)
 		{
-			GameSave save = GameSave.Load(m_selectedSave);
+			WorldSave save = await WorldSave.LoadAsync(m_selectedSave);
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>> regionToBytesTransform = new TransformBlock<RegionFile, Tuple<GameSave, RegionFile, byte[]>>(x =>
+			TransformBlock<RegionFile, Tuple<WorldSave, RegionFile, byte[]>> regionToBytesTransform = new TransformBlock<RegionFile, Tuple<WorldSave, RegionFile, byte[]>>(x =>
 			{
 				byte[] bytes = GetRegionBytes(x);
 				return Tuple.Create(save, x, bytes);
 			}, new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, MaxDegreeOfParallelism = 4});
 			
-			ActionBlock<Tuple<GameSave, RegionFile, byte[]>> renderRegionAction = new ActionBlock<Tuple<GameSave, RegionFile, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
+			ActionBlock<Tuple<WorldSave, RegionFile, byte[]>> renderRegionAction = new ActionBlock<Tuple<WorldSave, RegionFile, byte[]>>(x => RenderRegion(x.Item1, x.Item2, x.Item3),
 				new ExecutionDataflowBlockOptions { CancellationToken = m_source.Token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
 
 			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
@@ -129,7 +129,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 			Elapsed = stopwatch.Elapsed;
 		}
 
-		private void RenderRegion(GameSave save, RegionFile region, byte[] bytes)
+		private void RenderRegion(WorldSave save, RegionFile region, byte[] bytes)
 		{
 			int regionXOffset = region.Bounds.X * Constants.RegionBlockWidth - LengthUtility.RegionsToBlocks(save.Bounds.X);
 			int regionZOffset = region.Bounds.Z * Constants.RegionBlockWidth - LengthUtility.RegionsToBlocks(save.Bounds.Z);
