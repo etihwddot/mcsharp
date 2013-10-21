@@ -50,7 +50,7 @@ namespace MCSharp.ConsoleApp
 			{
 				save.Regions.AsParallel().ForAll(region =>
 				{
-					string regionFileName = Path.GetFileName(region.FileName);
+					string regionFileName = Path.GetFileName(region.Location);
 
 					IEnumerable<ChunkData> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
