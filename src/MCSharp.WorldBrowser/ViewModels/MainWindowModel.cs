@@ -160,9 +160,9 @@ namespace MCSharp.WorldBrowser.ViewModels
 						Color32 color = BiomeKindUtility.GetColor(biome);
 
 						if (lastHeight.HasValue && height > lastHeight)
-							color = BlendWith(color, Color32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+							color = Color32.Blend(color, Color32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
 						if (lastHeight.HasValue && height < lastHeight)
-							color = BlendWith(color, Color32.FromArgb(0x50, 0x00, 0x00, 0x00));
+							color = Color32.Blend(color, Color32.FromArgb(0x50, 0x00, 0x00, 0x00));
 
 						int pixelStart = (x + xOffset + ((z + zOffset) * Constants.RegionBlockWidth)) * s_bytesPerPixel;
 						bytes[pixelStart] = color.Blue;
@@ -176,17 +176,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 			}
 
 			return bytes;
-		}
-
-		private static Color32 BlendWith(Color32 background, Color32 overlay)
-		{
-			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
-			double alpha = overlay.Alpha / 256.0;
-
-			byte blendedR = (byte) (overlay.Red * alpha + background.Red * (1 - alpha));
-			byte blendedG = (byte) (overlay.Green * alpha + background.Green * (1 - alpha));
-			byte blendedB = (byte) (overlay.Blue * alpha + background.Blue * (1 - alpha));
-			return Color32.FromRgb(blendedR, blendedG, blendedB);
 		}
 
 		static readonly PixelFormat s_pixelFormat = PixelFormats.Bgra32;

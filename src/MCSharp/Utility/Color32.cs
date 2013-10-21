@@ -12,6 +12,17 @@
 			return new Color32(0xFF, red, green, blue);
 		}
 
+		public static Color32 Blend(Color32 background, Color32 overlay)
+		{
+			// from http://en.wikipedia.org/wiki/Alpha_compositing#Alpha_blending
+			double alpha = overlay.Alpha / 256.0;
+
+			byte blendedR = (byte) (overlay.Red * alpha + background.Red * (1 - alpha));
+			byte blendedG = (byte) (overlay.Green * alpha + background.Green * (1 - alpha));
+			byte blendedB = (byte) (overlay.Blue * alpha + background.Blue * (1 - alpha));
+			return Color32.FromRgb(blendedR, blendedG, blendedB);
+		}
+
 		private Color32(byte alpha, byte red, byte green, byte blue)
 		{
 			m_alpha = alpha;
