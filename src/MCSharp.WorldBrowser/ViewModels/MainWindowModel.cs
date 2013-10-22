@@ -16,7 +16,7 @@ using MCSharp.Utility;
 
 namespace MCSharp.WorldBrowser.ViewModels
 {
-	public sealed class MainWindowModel : ViewModel, IRenderTarget
+	public sealed class MainWindowModel : ViewModel
 	{
 		public MainWindowModel()
 		{
@@ -155,22 +155,10 @@ namespace MCSharp.WorldBrowser.ViewModels
 			m_image = new WriteableBitmap(size.Width, size.Height, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
 
-			await m_selectedRenderer.RenderAsync(save, this, token);
+			using (WriteableBitmapRenderTarget target = new WriteableBitmapRenderTarget(m_image))
+				await m_selectedRenderer.RenderAsync(save, target, token);
 
 			WriteLine("Total time: {0}", stopwatch.Elapsed);
-		}
-
-		public void WritePixels(int x, int y, int width, int height, ColorBgra32[] pixels)
-		{
-			if (m_image == null)
-				return;
-
-			if (pixels.Length != width * height)
-				throw new InvalidOperationException("The number of pixels needs to be the same as the height times width.");
-
-			Int32Rect invalidArea = new Int32Rect(x, y, width, height);
-			
-			m_image.WritePixels(invalidArea, pixels, width * s_bytesPerPixel, 0);
 		}
 
 		static readonly PixelFormat s_pixelFormat = PixelFormats.Bgra32;

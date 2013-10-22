@@ -22,81 +22,61 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		public async Task RenderAsync(WorldSave save, IRenderTarget target, CancellationToken token)
 		{
-			TransformBlock<RegionInfo, Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>> regionToBytesTransform = new TransformBlock<RegionInfo, Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>>(x =>
-			{
-				ColorBgra32[] pixels = GetRegionPixels(x);
-				return Tuple.Create(target, save, x, pixels);
-			}, new ExecutionDataflowBlockOptions { CancellationToken = token, MaxDegreeOfParallelism = 4 });
-
-			ActionBlock<Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>> renderRegionAction = new ActionBlock<Tuple<IRenderTarget, WorldSave, RegionInfo, ColorBgra32[]>>(
-				x => RenderRegion(x.Item1, x.Item2, x.Item3, x.Item4), new ExecutionDataflowBlockOptions { CancellationToken = token, TaskScheduler = TaskScheduler.FromCurrentSynchronizationContext() });
-
-			regionToBytesTransform.LinkTo(renderRegionAction, new DataflowLinkOptions { PropagateCompletion = true });
-			
-			foreach (var region in save.Regions)
-				regionToBytesTransform.Post(region);
-			regionToBytesTransform.Complete();
+			IEnumerable<Task> tasks = save.Regions
+				.Select(x => RenderRegionAsync(x, save, target, token));
 
 			try
 			{
-				await renderRegionAction.Completion;
+				await Task.WhenAll(tasks);
 			}
 			catch (OperationCanceledException)
 			{
 			}
 		}
 
-		private void RenderRegion(IRenderTarget target, WorldSave save, RegionInfo region, ColorBgra32[] pixels)
+		private static Task RenderRegionAsync(RegionInfo region, WorldSave save, IRenderTarget target, CancellationToken token)
 		{
-			int regionXBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.X - save.Bounds.X);
-			int regionZBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z - save.Bounds.Z);
-
-			int blockWidth = LengthUtility.RegionsToBlocks(region.Bounds.Width);
-
-			target.WritePixels(regionXBlockOffset, regionZBlockOffset, LengthUtility.RegionsToBlocks(region.Bounds.Width), LengthUtility.RegionsToBlocks(region.Bounds.Height), pixels);
-		}
-
-		private static ColorBgra32[] GetRegionPixels(RegionInfo region)
-		{
-			IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
-
-			int regionBlockWidth = LengthUtility.RegionsToBlocks(1);
-
-			ColorBgra32[] pixels = new ColorBgra32[regionBlockWidth * regionBlockWidth];
-
-			foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
+			return Task.Run(() =>
 			{
-				// Stop if canceled in middle of chunk processing
-				//token.ThrowIfCancellationRequested();
+				IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
-				int chunkBlockWidth = LengthUtility.ChunksToBlocks(1);
-
-				for (int z = 0; z < chunkBlockWidth; z++)
+				foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 				{
-					int? lastHeight = null;
+					int xOffset = LengthUtility.ChunksToBlocks(chunk.XPosition.Value) - LengthUtility.RegionsToBlocks(save.Bounds.X);
+					int zOffset = LengthUtility.ChunksToBlocks(chunk.ZPosition.Value) - LengthUtility.RegionsToBlocks(save.Bounds.Z);
 
-					for (int x = 0; x < chunkBlockWidth; x++)
+					// Stop if canceled in middle of chunk processing
+					token.ThrowIfCancellationRequested();
+
+					int chunkBlockWidth = LengthUtility.ChunksToBlocks(1);
+
+					for (int z = 0; z < chunkBlockWidth; z++)
 					{
-						BiomeKind biome = chunk.GetBiome(x, z);
+						int? lastHeight = null;
 
-						int height = chunk.GetHeight(x, z);
+						for (int x = 0; x < chunkBlockWidth; x++)
+						{
+							int imageX = x + xOffset;
+							int imageY = z + zOffset;
 
-						ColorBgra32 color = BiomeKindUtility.GetColor(biome);
+							BiomeKind biome = chunk.GetBiome(x, z);
 
-						if (lastHeight.HasValue && height > lastHeight)
-							color = ColorBgra32.Blend(color, ColorBgra32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
-						if (lastHeight.HasValue && height < lastHeight)
-							color = ColorBgra32.Blend(color, ColorBgra32.FromArgb(0x50, 0x00, 0x00, 0x00));
+							int height = chunk.GetHeight(x, z);
 
-						int pixelStart = (x + chunk.Info.X + ((z + chunk.Info.Z) * regionBlockWidth));
-						pixels[pixelStart] = color;
+							ColorBgra32 color = BiomeKindUtility.GetColor(biome);
 
-						lastHeight = height;
+							if (lastHeight.HasValue && height > lastHeight)
+								color = ColorBgra32.Blend(color, ColorBgra32.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+							if (lastHeight.HasValue && height < lastHeight)
+								color = ColorBgra32.Blend(color, ColorBgra32.FromArgb(0x50, 0x00, 0x00, 0x00));
+
+							target.SetPixel(imageX, imageY, color);
+
+							lastHeight = height;
+						}
 					}
 				}
-			}
-
-			return pixels;
+			});
 		}
 
 		public Task<PixelSize> GetRenderSizeAsync(WorldSave save, CancellationToken token)

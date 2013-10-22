@@ -56,7 +56,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 				IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
 				int regionBlockWidth = LengthUtility.RegionsToBlocks(1);
-				ColorBgra32[] pixels = new ColorBgra32[regionBlockWidth * regionBlockWidth];
 
 				foreach (Chunk chunk in regionChunks.Where(x => !x.IsEmpty))
 				{
@@ -128,8 +127,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 							if (hillshade == 180)
 								overlay = ColorBgra32.FromArgb(100, hillshadeByte, hillshadeByte, hillshadeByte);
 
-							int pixelStart = (x + chunk.Info.X + ((z + chunk.Info.Z) * regionBlockWidth));
-							pixels[pixelStart] = ColorBgra32.Blend(color, overlay);
+							target.SetPixel(imageX, imageY, ColorBgra32.Blend(color, overlay));
 						}
 					}
 
@@ -140,16 +138,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 						originZOffset = zOffset;
 					}
 				}
-
-				context.Post(_ =>
-				{
-					int regionXBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.X - save.Bounds.X);
-					int regionZBlockOffset = LengthUtility.RegionsToBlocks(region.Bounds.Z - save.Bounds.Z);
-
-					int blockWidth = LengthUtility.RegionsToBlocks(region.Bounds.Width);
-
-					target.WritePixels(regionXBlockOffset, regionZBlockOffset, LengthUtility.RegionsToBlocks(region.Bounds.Width), LengthUtility.RegionsToBlocks(region.Bounds.Height), pixels);
-				}, null);
 			});
 		}
 

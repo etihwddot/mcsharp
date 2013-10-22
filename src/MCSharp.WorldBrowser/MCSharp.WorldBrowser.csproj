@@ -67,6 +67,7 @@
     <Compile Include="ViewModels\PixelSize.cs" />
     <Compile Include="ViewModels\IRenderer.cs" />
     <Compile Include="ViewModels\IRenderTarget.cs" />
+    <Compile Include="ViewModels\WriteableBitmapRenderTarget.cs" />
     <Compile Include="Views\PanZoomControl.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
