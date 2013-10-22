@@ -56,7 +56,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 			await Task.Run(() =>
 			{
-				save.Regions.AsParallel().ForAll(region =>
+				save.Regions.AsParallel().WithDegreeOfParallelism(3).ForAll(region =>
 				{
 					IEnumerable<Chunk> regionChunks = ChunkLoader.LoadChunksInRegion(region);
 
