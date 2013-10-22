@@ -76,7 +76,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 						}
 					}
 				}
-			});
+			}, token);
 		}
 
 		public Task<PixelSize> GetRenderSizeAsync(WorldSave save, CancellationToken token)
