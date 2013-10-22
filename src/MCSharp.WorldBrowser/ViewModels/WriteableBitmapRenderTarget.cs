@@ -19,7 +19,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 			m_image = image;
 			m_width = m_image.PixelWidth;
 			m_bytesPerPixel = m_image.Format.BitsPerPixel / 8;
-			m_bag = new ConcurrentBag<PixelData>();
+			m_queue = new ConcurrentQueue<PixelData>();
 
 			// create background rendering thread
 			m_backgroundThread = new Thread(RenderBagWork);
@@ -28,7 +28,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		public void SetPixel(int x, int y, ColorBgra32 color)
 		{
-			m_bag.Add(new PixelData { x = x, y = y, Color = color });
+			m_queue.Enqueue(new PixelData { x = x, y = y, Color = color });
 		}
 		
 		private void RenderBagWork()
@@ -42,7 +42,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 			{
 				// try to get the pixel data
 				PixelData data;
-				if (!m_bag.TryTake(out data))
+				if (!m_queue.TryDequeue(out data))
 				{
 					if (m_completed)
 					{
@@ -110,8 +110,8 @@ namespace MCSharp.WorldBrowser.ViewModels
 		readonly WriteableBitmap m_image;
 		readonly int m_width;
 		readonly int m_bytesPerPixel;
-		
-		ConcurrentBag<PixelData> m_bag;
+
+		ConcurrentQueue<PixelData> m_queue;
 		Thread m_backgroundThread;
 		bool m_completed;
 	}
