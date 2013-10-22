@@ -22,7 +22,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 
 		public Task<PixelSize> GetRenderSizeAsync(WorldSave save, CancellationToken token)
 		{
-			return Task.Run(() => new PixelSize(LengthUtility.RegionsToBlocks(save.Bounds.Width), LengthUtility.RegionsToBlocks(save.Bounds.Height)));
+			return Task.Run(() => new PixelSize(LengthUtility.RegionsToBlocks(save.Bounds.Width), LengthUtility.RegionsToBlocks(save.Bounds.Height)), token);
 		}
 
 		public async Task RenderAsync(WorldSave save, IRenderTarget target, CancellationToken token)

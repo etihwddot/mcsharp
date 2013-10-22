@@ -6,9 +6,9 @@ using MCSharp.NamedBinaryTag;
 
 namespace MCSharp
 {
-	public sealed class GameSaveInfo
+	public sealed class WorldSaveInfo
 	{
-		public static IEnumerable<GameSaveInfo> GetAvailableSaves()
+		public static IEnumerable<WorldSaveInfo> GetAvailableSaves()
 		{
 			string savesPath = Path.Combine(Constants.MinecraftPath, "saves");
 
@@ -23,7 +23,7 @@ namespace MCSharp
 					NbtCompound root = (NbtCompound) nbtReader.ReadTag();
 					NbtCompound data = (NbtCompound) root.Tags.Single();
 					string name = data.Tags.OfType<NbtString>().First(x => x.Name == "LevelName").Value;
-					yield return new GameSaveInfo(name, saveFolder);
+					yield return new WorldSaveInfo(name, saveFolder);
 				}
 			}
 		}
@@ -43,7 +43,7 @@ namespace MCSharp
 			get { return m_location; }
 		}
 
-		private GameSaveInfo(string name, string location)
+		private WorldSaveInfo(string name, string location)
 		{
 			m_name = name;
 			m_location = location;

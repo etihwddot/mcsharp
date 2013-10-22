@@ -54,7 +54,7 @@
     <Compile Include="ChunkLoader.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="WorldSave.cs" />
-    <Compile Include="GameSaveInfo.cs" />
+    <Compile Include="WorldSaveInfo.cs" />
     <Compile Include="NamedBinaryTag\Nbt.cs" />
     <Compile Include="NamedBinaryTag\NbtDouble.cs" />
     <Compile Include="NamedBinaryTag\NbtFloat.cs" />

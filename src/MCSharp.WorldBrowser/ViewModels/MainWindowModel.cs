@@ -21,24 +21,25 @@ namespace MCSharp.WorldBrowser.ViewModels
 		public MainWindowModel()
 		{
 			m_log = new StringBuilder();
-			m_availableSaves = GameSaveInfo.GetAvailableSaves().ToList().AsReadOnly();
+			m_availableSaves = WorldSaveInfo.GetAvailableSaves().ToList().AsReadOnly();
 			SelectedSave = m_availableSaves.FirstOrDefault();
 			
 			m_availableRenderers = new List<IRenderer>
 			{
 				new BasicBiomeRenderer(),
 				new HillshadeRenderer(),
+				new BlockRenderer(),
 			}.AsReadOnly();
 			SelectedRenderer = m_availableRenderers.FirstOrDefault();
 		}
 
-		public ReadOnlyCollection<GameSaveInfo> AvailableSaves
+		public ReadOnlyCollection<WorldSaveInfo> AvailableSaves
 		{
 			get { return m_availableSaves; }
 		}
 
 		public static readonly string SelectedSaveProperty = ExpressionUtility.GetPropertyName((MainWindowModel x) => x.SelectedSave);
-		public GameSaveInfo SelectedSave
+		public WorldSaveInfo SelectedSave
 		{
 			get
 			{
@@ -180,8 +181,8 @@ namespace MCSharp.WorldBrowser.ViewModels
 		readonly StringBuilder m_log;
 
 		CancellationTokenSource m_source;
-		GameSaveInfo m_selectedSave;
-		ReadOnlyCollection<GameSaveInfo> m_availableSaves;
+		WorldSaveInfo m_selectedSave;
+		ReadOnlyCollection<WorldSaveInfo> m_availableSaves;
 		ReadOnlyCollection<IRenderer> m_availableRenderers;
 		WriteableBitmap m_image;
 		Task m_imageTask;

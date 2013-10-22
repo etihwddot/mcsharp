@@ -18,7 +18,7 @@ namespace MCSharp.ConsoleApp
 
 			Stopwatch stopwatchTotal = Stopwatch.StartNew();
 
-			GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
+			WorldSaveInfo saveInfo = WorldSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "Mapping" || Path.GetFileName(x.Location) == "Mapping");
 			// GameSaveInfo saveInfo = GameSaveInfo.GetAvailableSaves().FirstOrDefault(x => x.Name == "world" || Path.GetFileName(x.Location) == "world");
 			if (saveInfo == null)
 			{

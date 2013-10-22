@@ -11,7 +11,7 @@
 	Width="1024">
 	
 	<Window.Resources>
-		<DataTemplate DataType="{x:Type mcs:GameSaveInfo}">
+		<DataTemplate DataType="{x:Type mcs:WorldSaveInfo}">
 			<StackPanel>
 				<TextBlock>
 					<Run Text="{Binding Name, Mode=OneWay}" />

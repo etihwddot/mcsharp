@@ -9,7 +9,7 @@ namespace MCSharp
 {
 	public sealed class WorldSave
 	{
-		public static Task<WorldSave> LoadAsync(GameSaveInfo info)
+		public static Task<WorldSave> LoadAsync(WorldSaveInfo info)
 		{
 			return Task.Run(() =>
 			{

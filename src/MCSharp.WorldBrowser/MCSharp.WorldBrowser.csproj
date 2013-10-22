@@ -62,6 +62,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\BasicBiomeRenderer.cs" />
+    <Compile Include="ViewModels\BlockRenderer.cs" />
     <Compile Include="ViewModels\HillshadeRenderer.cs" />
     <Compile Include="ViewModels\PixelSize.cs" />
     <Compile Include="ViewModels\IRenderer.cs" />
