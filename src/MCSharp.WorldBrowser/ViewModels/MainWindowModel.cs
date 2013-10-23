@@ -116,7 +116,7 @@ namespace MCSharp.WorldBrowser.ViewModels
 			RaisePropertyChanged(LogProperty);
 		}
 
-		private void GenerateImage()
+		private async void GenerateImage()
 		{
 			if (m_selectedSave == null || m_selectedRenderer == null)
 				return;
@@ -125,12 +125,13 @@ namespace MCSharp.WorldBrowser.ViewModels
 			if (m_source != null)
 				m_source.Cancel();
 
-			// TODO: determine if something like this is necessary
-			if (m_imageTask != null && m_imageTask.Status == TaskStatus.Running)
+			// wait for work to cancel
+			if (m_imageTask != null)
 				m_imageTask.Wait();
 
 			m_source = new CancellationTokenSource();
 			m_imageTask = DoGenerateImage(m_source.Token);
+			await m_imageTask;
 		}
 
 		private async Task DoGenerateImage(CancellationToken token)
@@ -143,14 +144,6 @@ namespace MCSharp.WorldBrowser.ViewModels
 			WorldSave save = await WorldSave.LoadAsync(m_selectedSave);
 
 			PixelSize size = await m_selectedRenderer.GetRenderSizeAsync(save, token);
-
-			m_image = null;
-			RaisePropertyChanged(ImageProperty);
-
-			// clean up old objects
-			GC.Collect();
-			GC.WaitForPendingFinalizers();
-			GC.Collect();
 
 			m_image = new WriteableBitmap(size.Width, size.Height, c_imageDpi, c_imageDpi, s_pixelFormat, null);
 			RaisePropertyChanged(ImageProperty);
